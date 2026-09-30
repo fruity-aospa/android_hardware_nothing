@@ -1,0 +1,2 @@
+# Publish the factory shell color for the Glyph app.
+set_prop(hal_light_default, vendor_glyph_prop)

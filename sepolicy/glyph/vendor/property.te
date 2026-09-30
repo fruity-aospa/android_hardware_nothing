@@ -1,0 +1,2 @@
+# Shell color shared by the native lights HAL and Glyph application.
+vendor_public_prop(vendor_glyph_prop)

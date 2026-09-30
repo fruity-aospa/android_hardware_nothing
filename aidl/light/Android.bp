@@ -1,0 +1,24 @@
+//
+// SPDX-FileCopyrightText: Paranoid Android
+// SPDX-License-Identifier: Apache-2.0
+//
+
+rust_binary {
+    name: "android.hardware.lights-service.glyph",
+    relative_install_path: "hw",
+    init_rc: ["lights-glyph.rc"],
+    vintf_fragments: ["lights-glyph.xml"],
+    vendor: true,
+    rustlibs: [
+        "liblogger",
+        "liblog_rust",
+        "libbinder_rs",
+        "librustutils",
+        "android.hardware.light-V3-rust",
+    ],
+    srcs: ["main.rs"],
+    cfgs: select(soong_config_variable("nothing_glyph", "device"), {
+        any @ device: [device],
+        default: [],
+    }),
+}
