@@ -1,32 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2023-2024 Paranoid Android
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<resources>
 
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
+    <!-- Which device's strips these resources describe. -->
+    <string name="config_device" translatable="false">phone1</string>
 
-          http://www.apache.org/licenses/LICENSE-2.0
+    <!-- Highest level the strips accept. -->
+    <integer name="config_brightnessMax" translatable="false">3840</integer>
 
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
--->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-
-    <!-- Device -->
-    <string name="glyph_settings_device" translatable="false">phone1</string>
-
-    <!-- Brighntess -->
-    <integer name="glyph_settings_brightness_max" translatable="false">4095</integer>
-    <!-- Should be the same length as glyph_auto_brightness_levels array -->
-    <integer-array name="glyph_settings_brightness_levels" translatable="false">
-        <item>102</item>
-        <item>682</item>
-        <item>1365</item>
-        <item>@integer/glyph_settings_brightness_max</item>
+    <!-- The levels the brightness slider steps through, dimmest first. -->
+    <integer-array name="config_brightnessLevels" translatable="false">
+        <item>750</item>
+        <item>2625</item>
+        <item>@integer/config_brightnessMax</item>
     </integer-array>
+
+    <!-- The glyphs of the device drawing. -->
+    <array name="config_glyphViews" translatable="false">
+        <item>@id/preview_device_camera</item>
+        <item>@id/preview_device_slant</item>
+        <item>@id/preview_device_center</item>
+        <item>@id/preview_device_bar</item>
+        <item>@id/preview_device_dot</item>
+    </array>
+
+    <!-- The channels each glyph of the drawing shows, in the order of the glyphs above. -->
+    <string-array name="config_glyphViewZones" translatable="false">
+        <item>0</item> <!-- camera -->
+        <item>1</item> <!-- slant -->
+        <item>2</item> <!-- center -->
+        <item>3</item> <!-- bar -->
+        <item>4</item> <!-- dot -->
+    </string-array>
+
+    <!-- How the music visualizer reacts to sound. Each array below has one entry for each band,
+         and each band lights one glyph. -->
+
+    <!-- The fft buckets each band averages, a bucket or a range of them. -->
+    <string-array name="config_visualizerBuckets" translatable="false">
+        <item>8-11</item> <!-- camera -->
+        <item>15-22</item> <!-- slant -->
+        <item>0</item> <!-- center -->
+        <item>30-44</item> <!-- bar -->
+        <item>55-74</item> <!-- dot -->
+    </string-array>
+
+    <!-- How long, in milliseconds, each band's ceiling holds after a beat. -->
+    <integer-array name="config_visualizerDecayWindows" translatable="false">
+        <item>1000</item> <!-- camera -->
+        <item>500</item> <!-- slant -->
+        <item>300</item> <!-- center -->
+        <item>200</item> <!-- bar -->
+        <item>100</item> <!-- dot -->
+    </integer-array>
+
+    <!-- The part of its ceiling a value has to reach to count as a beat. -->
+    <array name="config_visualizerTriggerRatios" translatable="false">
+        <item>0.75</item> <!-- camera -->
+        <item>0.7</item> <!-- slant -->
+        <item>0.75</item> <!-- center -->
+        <item>0.7</item> <!-- bar -->
+        <item>0.7</item> <!-- dot -->
+    </array>
+
+    <!-- What each band's brightness is multiplied by each capture between beats. -->
+    <array name="config_visualizerTriggerDecays" translatable="false">
+        <item>0.56</item> <!-- camera -->
+        <item>0.66</item> <!-- slant -->
+        <item>0.56</item> <!-- center -->
+        <item>0.66</item> <!-- bar -->
+        <item>0.66</item> <!-- dot -->
+    </array>
+
+    <!-- What each band's ceiling is multiplied by each capture once it falls. -->
+    <array name="config_visualizerCeilingDecays" translatable="false">
+        <item>0.65</item> <!-- camera -->
+        <item>0.65</item> <!-- slant -->
+        <item>0.95</item> <!-- center -->
+        <item>0.63</item> <!-- bar -->
+        <item>0.63</item> <!-- dot -->
+    </array>
+
+    <!-- How many levels a csv line may carry, one entry per width accepted. -->
+    <integer-array name="config_patternLengths" translatable="false">
+        <item>5</item>
+    </integer-array>
+
+    <!-- Whether the battery meter's first step is the dot beside the bar. -->
+    <bool name="config_batteryDot" translatable="false">true</bool>
+
+    <!-- The channels an essential notification holds lit, the slant. -->
+    <string-array name="config_essentialZones" translatable="false">
+        <item>1</item>
+    </string-array>
+
+    <!-- The ringtone a call plays until the user chooses another. -->
+    <string name="config_defaultCallAnimation" translatable="false">Beetle (Custom)</string>
+
+    <!-- The animation a notification plays until the user chooses another. -->
+    <string name="config_defaultNotificationAnimation" translatable="false">Beak (Custom)</string>
+
+    <!-- Reads 1 while this device charges another. Empty where it cannot. -->
+    <string name="config_powershareActivePath" translatable="false">/sys/class/qcom-battery/wls_reverse_status</string>
+
+    <!-- Reads 1 while reverse charging is armed. -->
+    <string name="config_powershareEnabledPath" translatable="false">/sys/class/qcom-battery/wireless_boost_en</string>
 
 </resources>

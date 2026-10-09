@@ -1,37 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2023-2024 Paranoid Android
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<resources>
 
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
+    <!-- Which device's strips these resources describe. -->
+    <string name="config_device" translatable="false"></string>
 
-          http://www.apache.org/licenses/LICENSE-2.0
+    <!-- Highest level the strips accept. -->
+    <integer name="config_brightnessMax" translatable="false"></integer>
 
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
--->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-
-    <!-- Device -->
-    <string name="glyph_settings_device" translatable="false"></string>
-
-    <!-- Auto brightness -->
-    <string name="glyph_light_sensor" translatable="false"></string>
-    <integer-array name="glyph_auto_brightness_levels" translatable="false">
+    <!-- The levels the brightness slider steps through, dimmest first. -->
+    <integer-array name="config_brightnessLevels" translatable="false">
     </integer-array>
 
-    <!-- Brighntess -->
-    <integer name="glyph_settings_brightness_max" translatable="false"></integer>
-    <!-- Should be the same length as glyph_auto_brightness_levels array -->
-    <integer-array name="glyph_settings_brightness_levels" translatable="false">
+    <!-- The levels on a white shell, which diffuses more light. None where both shells step through
+         the same levels. -->
+    <integer-array name="config_brightnessLevelsWhite" translatable="false">
     </integer-array>
 
+    <!-- The type of the wake-up sensor that reports the screen facing down, as 2. Empty where the
+         accelerometer has to tell. -->
+    <string name="config_flipSensorType" translatable="false"></string>
 
-    <integer-array name="glyph_settings_notifs_essential_led_array" translatable="false">
+    <!-- The type of the light sensor behind the strips. Empty where there is none. -->
+    <string name="config_ambientSensorType" translatable="false"></string>
+
+    <!-- The lux each auto brightness step starts at, dimmest first. -->
+    <integer-array name="config_ambientLux" translatable="false">
     </integer-array>
+
+    <!-- The level of each step on a black shell. -->
+    <integer-array name="config_ambientLevels" translatable="false">
+    </integer-array>
+
+    <!-- The level of each step on a white shell, which diffuses more light. -->
+    <integer-array name="config_ambientLevelsWhite" translatable="false">
+    </integer-array>
+
+    <!-- The glyphs of the device drawing. -->
+    <array name="config_glyphViews" translatable="false">
+    </array>
+
+    <!-- The channels each glyph of the drawing shows, in the order of the glyphs above. -->
+    <string-array name="config_glyphViewZones" translatable="false">
+    </string-array>
+
+    <!-- How many levels a csv line may carry, one entry per width accepted. -->
+    <integer-array name="config_patternLengths" translatable="false">
+    </integer-array>
+
+    <!-- The channels each zone of a narrower frame lights, in the order the frame lists them. None
+         where the device only takes frames of its own width. -->
+    <string-array name="config_frameZones" translatable="false">
+    </string-array>
+
+    <!-- The channels each band of the music visualizer lights, in the order its tuning lists them.
+         None where its bands are the glyphs of a frame. -->
+    <string-array name="config_visualizerZones" translatable="false">
+    </string-array>
+
+    <!-- How the music visualizer reacts to sound. Each array below has one entry for each band,
+         in the order of the visualizer zones above, or of the glyphs where there are none. -->
+
+    <!-- The fft buckets each band averages, a bucket or a range of them. -->
+    <string-array name="config_visualizerBuckets" translatable="false">
+    </string-array>
+
+    <!-- How long, in milliseconds, each band's ceiling holds after a beat. -->
+    <integer-array name="config_visualizerDecayWindows" translatable="false">
+    </integer-array>
+
+    <!-- The part of its ceiling a value has to reach to count as a beat. -->
+    <array name="config_visualizerTriggerRatios" translatable="false">
+    </array>
+
+    <!-- What each band's brightness is multiplied by each capture between beats. -->
+    <array name="config_visualizerTriggerDecays" translatable="false">
+    </array>
+
+    <!-- What each band's ceiling is multiplied by each capture once it falls. -->
+    <array name="config_visualizerCeilingDecays" translatable="false">
+    </array>
+
+    <!-- How long, in milliseconds, a band waits after a beat before it can beat again. -->
+    <integer name="config_visualizerRetrigger" translatable="false">0</integer>
+
+    <!-- Whether the battery meter's first step is the dot beside the bar. -->
+    <bool name="config_batteryDot" translatable="false">false</bool>
+
+    <!-- The channels an essential notification holds lit, in the form of the zones above. -->
+    <string-array name="config_essentialZones" translatable="false">
+    </string-array>
+
+    <!-- The ringtone a call plays until the user chooses another. -->
+    <string name="config_defaultCallAnimation" translatable="false"></string>
+
+    <!-- The animation a notification plays until the user chooses another. -->
+    <string name="config_defaultNotificationAnimation" translatable="false"></string>
+
+    <!-- Reads 1 while this device charges another. Empty where it cannot. -->
+    <string name="config_powershareActivePath" translatable="false"></string>
+
+    <!-- Reads 1 while reverse charging is armed. -->
+    <string name="config_powershareEnabledPath" translatable="false"></string>
 
 </resources>

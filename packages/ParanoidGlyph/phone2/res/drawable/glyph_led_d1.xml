@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="26.51dp" android:width="4.12dp" android:viewportWidth="7" android:viewportHeight="45">
-    <path android:fillColor="@color/glyph_settings_device_glyph_color" android:pathData="M3.067,0.1C1.423,0.1 0.099,1.433 0.099,3.068V41.762C0.099,43.405 1.432,44.73 3.067,44.73C4.71,44.73 6.035,43.397 6.035,41.762V22.419V16.844V3.077C6.035,1.433 4.702,0.108 3.067,0.108V0.1Z" android:fillType="evenOdd"/>
+<!--
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="105.43dp"
+    android:height="225dp"
+    android:viewportWidth="105.43"
+    android:viewportHeight="225">
+
+    <path
+        android:fillColor="@color/preview_device_glyph"
+        android:pathData="M52.71,210.66C53.7,210.66 54.51,209.86 54.51,208.87C54.51,208.87 54.51,184.2 54.51,184.2C54.51,183.21 53.7,182.4 52.71,182.4C51.72,182.4 50.91,183.21 50.91,184.2C50.91,184.2 50.91,208.87 50.91,208.87C50.91,209.86 51.72,210.66 52.71,210.66Z" />
+
 </vector>

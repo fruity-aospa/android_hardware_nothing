@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<resources>
+
+    <!-- The name of the app that lets apps made for the glyph sdk reach the glyphs. -->
+    <string name="app_label" translatable="false">Glyph Adapter</string>
+
+</resources>

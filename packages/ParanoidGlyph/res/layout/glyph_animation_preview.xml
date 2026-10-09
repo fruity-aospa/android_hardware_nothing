@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="horizontal"
+    android:paddingTop="25dp"
+    android:paddingBottom="25dp">
+
+    <FrameLayout
+        android:id="@+id/preview_badge"
+        android:layout_width="@dimen/preview_badge_size"
+        android:layout_height="@dimen/preview_badge_size"
+        android:layout_marginTop="@dimen/preview_badge_top"
+        android:layout_marginEnd="@dimen/preview_badge_gap"
+        android:background="@drawable/preview_badge"
+        android:importantForAccessibility="no"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/preview_badge_icon"
+            android:layout_width="@dimen/preview_badge_icon_size"
+            android:layout_height="@dimen/preview_badge_icon_size"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
+
+    <include layout="@layout/glyph_animation_preview_device" />
+
+    <Space
+        android:id="@+id/preview_badge_balance"
+        android:layout_width="@dimen/preview_badge_size"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/preview_badge_gap"
+        android:visibility="gone" />
+
+</LinearLayout>

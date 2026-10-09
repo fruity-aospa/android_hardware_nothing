@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="117.77"
+    android:viewportHeight="117.77">
+
+    <path
+        android:fillColor="#fafafa"
+        android:pathData="M0,58.88A58.88,58.88 0,1 1 117.77,58.88A58.88,58.88 0,1 1 0,58.88Z" />
+
+    <path
+        android:fillColor="#040207"
+        android:pathData="M96.29,49.77C96.83,49.64 97.37,49.98 97.48,50.52C99.12,58.48 98.27,66.76 95.02,74.22C91.64,81.99 85.84,88.47 78.49,92.68C71.14,96.9 62.62,98.63 54.21,97.63C45.79,96.62 37.93,92.93 31.77,87.1C25.62,81.27 21.51,73.61 20.06,65.26C18.6,56.91 19.88,48.32 23.69,40.75C27.51,33.18 33.66,27.05 41.24,23.25C48.52,19.61 56.74,18.31 64.78,19.53C65.32,19.61 65.68,20.13 65.59,20.67C65.59,20.67 59.15,57 59.15,57C59.02,57.71 59.66,58.31 60.36,58.15C60.36,58.15 96.29,49.77 96.29,49.77Z" />
+
+</vector>

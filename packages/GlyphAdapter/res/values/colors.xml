@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<resources>
+
+    <!-- App icon -->
+    <color name="ic_launcher_background">#0e0f12</color>
+    <color name="ic_launcher_cookie">#8ab4f8</color>
+    <color name="ic_launcher_glyph">#0d1626</color>
+
+</resources>

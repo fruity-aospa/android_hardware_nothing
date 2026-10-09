@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="26.51dp" android:width="23.56dp" android:viewportWidth="40" android:viewportHeight="45">
-    <path android:fillColor="@color/glyph_settings_device_glyph_color" android:pathData="M34.13,1.311L0.658,41.201L0.614,41.256L0.565,41.327L0.522,41.402L0.492,41.463L0.464,41.526L0.435,41.608L0.412,41.691L0.398,41.759L0.388,41.826L0.382,41.913L0.381,42L0.385,42.067L0.393,42.136L0.408,42.221L0.43,42.306L0.451,42.37L0.476,42.434L0.514,42.513L0.557,42.587L0.595,42.645L0.636,42.7L0.691,42.766L0.751,42.828L0.805,42.875L2.169,44.019C3.426,45.075 5.3,44.911 6.355,43.655C6.356,43.653 38.682,5.13 38.682,5.13C39.736,3.874 39.573,1.999 38.316,0.944C37.059,-0.11 35.186,0.053 34.13,1.311Z" android:fillType="evenOdd"/>
+<!--
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="105.43dp"
+    android:height="225dp"
+    android:viewportWidth="105.43"
+    android:viewportHeight="225">
+
+    <path
+        android:fillColor="@color/preview_device_glyph"
+        android:pathData="M70.1,37.33C69.68,37.82 69.56,38.49 69.78,39.1C70,39.7 70.53,40.14 71.16,40.25C71.79,40.36 72.43,40.13 72.85,39.64C72.85,39.64 92.7,15.98 92.7,15.98C93.34,15.22 93.24,14.09 92.48,13.45C91.72,12.81 90.59,12.91 89.95,13.67C89.95,13.67 70.1,37.33 70.1,37.33Z" />
+
 </vector>

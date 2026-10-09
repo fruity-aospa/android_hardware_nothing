@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/pref_schedule_hours_title">
+
+    <co.aospa.glyph.ui.preference.ScheduleHoursPreference
+        android:key="glyph_schedule_hours_picker" />
+
+    <com.android.settingslib.widget.FooterPreference
+        android:key="glyph_schedule_hours_footer"
+        android:title="@string/schedule_hours_footer" />
+
+</PreferenceScreen>

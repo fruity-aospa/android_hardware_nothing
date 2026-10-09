@@ -1,56 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2024-2025 LunarisAOSP
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/pref_schedule_title">
 
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
-
-          http://www.apache.org/licenses/LICENSE-2.0
-
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
--->
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!-- Glyph Schedule Settings -->
-    <com.android.settingslib.widget.MainSwitchPreference
-        android:key="glyph_schedule_enable"
-        android:title="@string/glyph_settings_schedule_enable_title"/>
-
-    <androidx.preference.Preference
-        android:key="glyph_schedule_days"
-        android:icon="@drawable/ic_calendar_check"
-        android:title="@string/glyph_settings_active_days_title"
-        android:summary="@string/glyph_settings_active_days_summary"
-        android:dependency="glyph_schedule_enable" />
-
-    <Preference
-        android:key="glyph_schedule_start_time"
-        android:icon="@drawable/ic_hourglass_top"
-        android:title="@string/glyph_settings_schedule_start_time_title"
-        android:summary="@string/glyph_settings_schedule_start_time_summary"
-        android:dependency="glyph_schedule_enable" />
-
-    <Preference
-        android:key="glyph_schedule_end_time"
-        android:icon="@drawable/ic_hourglass_bottom"
-        android:title="@string/glyph_settings_schedule_end_time_title"
-        android:summary="@string/glyph_settings_schedule_end_time_summary"
-        android:dependency="glyph_schedule_enable" />
-
-    <Preference
-        android:key="glyph_schedule_status"
-        android:title="@string/glyph_settings_schedule_status_title"
-        android:summary="@string/glyph_settings_schedule_inactive"
+    <com.android.settingslib.widget.IllustrationPreference
+        android:key="glyph_schedule_preview"
         android:selectable="false" />
+
+    <PreferenceCategory
+        android:key="glyph_schedule_category"
+        android:title="@string/pref_category_timing">
+
+        <ListPreference
+            android:defaultValue="none"
+            android:entries="@array/schedule_mode_entries"
+            android:entryValues="@array/schedule_mode_values"
+            android:key="glyph_schedule_mode"
+            android:summary="%s"
+            android:title="@string/pref_schedule_mode_title" />
+
+        <Preference
+            android:key="glyph_schedule_bedtime"
+            android:summary="@string/pref_schedule_bedtime_summary"
+            android:title="@string/pref_schedule_bedtime_title">
+            <intent android:action="android.settings.ZEN_MODE_AUTOMATION_SETTINGS" />
+        </Preference>
+
+        <Preference
+            android:key="glyph_schedule_hours"
+            android:title="@string/pref_schedule_hours_title">
+            <intent android:action="co.aospa.glyph.action.SCHEDULE_HOURS_SETTINGS" />
+        </Preference>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="glyph_schedule_dnd"
+        android:title="@string/pref_category_schedule_dnd">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="glyph_schedule_dnd_sync"
+            android:summary="@string/pref_schedule_dnd_summary"
+            android:title="@string/pref_schedule_dnd_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="glyph_schedule_battery_saver"
+        android:title="@string/pref_category_schedule_battery_saver">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="glyph_schedule_battery_saver_sync"
+            android:summary="@string/pref_schedule_battery_saver_summary"
+            android:title="@string/pref_schedule_battery_saver_title" />
+
+    </PreferenceCategory>
 
     <com.android.settingslib.widget.FooterPreference
-        android:key="glyph_schedule_info"
-        android:title="@string/glyph_settings_schedule_info_summary"
-        android:selectable="false" />
+        android:key="glyph_schedule_footer"
+        android:title="@string/schedule_footer" />
+
 </PreferenceScreen>

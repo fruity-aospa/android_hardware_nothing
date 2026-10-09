@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ SPDX-FileCopyrightText: The LineageOS Project
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="106.3dp"
+    android:layout_height="225dp"
+    android:background="@drawable/preview_device"
+    android:clipChildren="false">
+
+    <ImageView
+        android:id="@+id/preview_device_a1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.3"
+        android:src="@drawable/glyph_led_a1" />
+
+    <ImageView
+        android:id="@+id/preview_device_b1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.3"
+        android:src="@drawable/glyph_led_b1" />
+
+    <ImageView
+        android:id="@+id/preview_device_a2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.3"
+        android:src="@drawable/glyph_led_a2" />
+
+</FrameLayout>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<resources>
+    <declare-styleable name="AddTilePreference">
+        <!-- The tile service to offer, by class name, absolute or relative to the package. -->
+        <attr name="tileService" format="string" />
+        <!-- The label the tile is offered under. -->
+        <attr name="tileLabel" format="reference" />
+        <!-- The icon the tile is offered with. -->
+        <attr name="tileIcon" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="GlyphAnimationPreference">
+        <!-- The icon of the status badge, if any. -->
+        <attr name="badgeIcon" format="reference" />
+    </declare-styleable>
+</resources>

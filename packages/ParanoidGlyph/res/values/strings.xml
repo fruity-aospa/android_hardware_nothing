@@ -1,279 +1,191 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2013-2016 The CyanogenMod Project
-                   2017 The LineageOS Project
-                   2020-2024 Paranoid Android
-
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
-
-          http://www.apache.org/licenses/LICENSE-2.0
-
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
--->
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <!-- DO NOT TRANSLATE Empty summary for dynamic preferences -->
-    <string name="summary_empty" translatable="false"></string>
+    <!-- Name of this application. [CHAR LIMIT=32] -->
+    <string name="app_label" translatable="false">Glyph Interface</string>
 
-    <!-- App Name -->
-    <string name="glyph_settings_app_name">Glyph interface</string>
+    <!-- Settings screen title, and the Settings homepage entry. [CHAR LIMIT=32] -->
+    <string name="settings_title">Glyph Interface</string>
+    <!-- Settings homepage entry summary. [CHAR LIMIT=NONE] -->
+    <string name="settings_summary">Options for Glyph lights</string>
+    <!-- Main switch: whether the strips are used at all. [CHAR LIMIT=48] -->
+    <string name="pref_glyph_lights_title">Glyph lights</string>
+    <!-- Settings item: how bright the strips are. [CHAR LIMIT=48] -->
+    <string name="pref_brightness_title">Brightness level</string>
+    <!-- Settings item: let the light around the phone set how bright the strips are. [CHAR LIMIT=48] -->
+    <string name="pref_auto_brightness_title">Auto brightness</string>
+    <!-- Settings item summary for auto brightness. [CHAR LIMIT=NONE] -->
+    <string name="pref_auto_brightness_summary">Adjust Glyph brightness to the light around the phone</string>
 
-    <string name="glyph_settings_default_option">Default</string>
+    <!-- Banner on the settings while the strips are dark for quiet hours. [CHAR LIMIT=48] -->
+    <string name="quiet_banner_title">Glyph lights are off for quiet hours</string>
+    <!-- Banner summary when a schedule or Bedtime mode keeps the strips dark. [CHAR LIMIT=NONE] -->
+    <string name="quiet_banner_schedule">They light again when your schedule ends.</string>
+    <!-- Banner summary when Do Not Disturb keeps the strips dark. [CHAR LIMIT=NONE] -->
+    <string name="quiet_banner_dnd">They light again when Do Not Disturb is off.</string>
+    <!-- Banner summary when Battery Saver keeps the strips dark. [CHAR LIMIT=NONE] -->
+    <string name="quiet_banner_battery_saver">They light again when Battery Saver is off.</string>
+    <!-- Banner button: opens the quiet hours screen. [CHAR LIMIT=24] -->
+    <string name="quiet_banner_action">Quiet hours</string>
 
-    <!-- Glyph Settings -->
-    <string name="glyph_settings_enable">Glyph lights</string>
-    <string name="glyph_settings_title">Glyph interface</string>
-    <string name="glyph_settings_summary">Options for Glyph lights</string>
+    <!-- Settings category for how bright the strips are. [CHAR LIMIT=32] -->
+    <string name="pref_category_brightness">Brightness</string>
 
-    <string name="glyph_settings_summary_battery_saving">Disabled by Battery Saver</string>
-    <string name="glyph_settings_summary_schedule">Disabled by schedule</string>
+    <!-- Settings category for what lights the strips on a call or a notification. [CHAR LIMIT=32] -->
+    <string name="pref_category_alerts">Alerts</string>
+    <!-- Settings item: the animation an incoming call rings with. [CHAR LIMIT=48] -->
+    <string name="pref_call_animation_title">Call animation</string>
+    <!-- Settings item summary for the call animation. [CHAR LIMIT=NONE] -->
+    <string name="pref_call_animation_summary">Flash LEDs on incoming calls</string>
+    <!-- Call screen main switch. [CHAR LIMIT=48] -->
+    <string name="pref_call_animation_enable_title">Enable call animation</string>
+    <!-- Call screen item: which animation to ring with. [CHAR LIMIT=48] -->
+    <string name="pref_call_animation_pattern_title">Call pattern</string>
+    <!-- Animation screens category: which animation to use, and trying it. [CHAR LIMIT=32] -->
+    <string name="pref_category_animation">Animation</string>
+    <!-- Animation screens button: plays the chosen animation on the glyphs once. [CHAR LIMIT=48] -->
+    <string name="pref_animation_play_title">Play on Glyph</string>
+    <!-- Notification screen category: which apps may light the glyphs. [CHAR LIMIT=32] -->
+    <string name="pref_category_apps">Apps</string>
 
-    <string name="glyph_settings_auto_brightness_toggle_title">Auto Brightness</string>
-    <string name="glyph_settings_auto_brightness_toggle_summary">Glyph brightness will automatically adjust to your environment</string>
+    <!-- Settings item: the animation a new notification plays. [CHAR LIMIT=48] -->
+    <string name="pref_notification_animation_title">Notification animation</string>
+    <!-- Settings item summary for the notification animation. [CHAR LIMIT=NONE] -->
+    <string name="pref_notification_animation_summary">Flash LEDs on new notifications</string>
+    <!-- Notification screen main switch. [CHAR LIMIT=48] -->
+    <string name="pref_notification_animation_enable_title">Enable notification animation</string>
+    <!-- Notification screen item: which animation to play. [CHAR LIMIT=48] -->
+    <string name="pref_notification_animation_pattern_title">Notification pattern</string>
+    <!-- Notification screen item: opens the list of apps that may light the strips. [CHAR LIMIT=48] -->
+    <string name="pref_allowed_apps_title">Apps to allow</string>
+    <!-- Settings item summary for the list of apps that may light the strips. [CHAR LIMIT=NONE] -->
+    <string name="pref_allowed_apps_summary">Choose which apps play the notification animation</string>
+    <!-- Apps to allow screen footer: what the list does. [CHAR LIMIT=NONE] -->
+    <string name="allowed_apps_footer">A notification from an allowed app plays the animation once. Apps left off are ignored, and apps you install later are allowed to begin with.</string>
+    <!-- Notification screen item: opens the list of apps that hold a glyph lit. [CHAR LIMIT=48] -->
+    <string name="pref_essential_apps_title">Essential Notifications</string>
+    <!-- Settings item summary for the list of apps that hold a glyph lit. [CHAR LIMIT=NONE] -->
+    <string name="pref_essential_apps_summary">Choose which apps hold a glyph lit until they are read</string>
+    <!-- Essential notifications screen footer: what the list does. [CHAR LIMIT=NONE] -->
+    <string name="essential_apps_footer">Essential Glyph will be displayed until Essential notifications are read or dismissed</string>
+    <!-- Notification screen summary when the user has not granted notification access. [CHAR LIMIT=NONE] -->
+    <string name="notifications_access_required">Notification access is required to enable Glyph notifications</string>
 
-    <string name="glyph_settings_brightness">Brightness</string>
+    <!-- Settings category for what the strips show of the battery and the volume. [CHAR LIMIT=32] -->
+    <string name="pref_category_indicators">Indicators</string>
+    <!-- Settings item: show the charge level while plugged in. [CHAR LIMIT=48] -->
+    <string name="pref_charging_meter_title">Charging meter</string>
+    <!-- Settings item summary for the charging meter. [CHAR LIMIT=NONE] -->
+    <string name="pref_charging_meter_summary">Wiggle for progress</string>
+    <!-- Charging meter screen footer: what the feature does. [CHAR LIMIT=NONE] -->
+    <string name="charging_meter_footer">Displays charging progression when charging with a cable.</string>
+    <!-- Settings item: show an animation while charging another device. [CHAR LIMIT=48] -->
+    <string name="pref_powershare_title">Reverse wireless charging</string>
+    <!-- Settings item summary, and screen footer, for reverse charging. [CHAR LIMIT=NONE] -->
+    <string name="pref_powershare_summary">Show an animation when reverse wireless charging is detected</string>
 
-    <string name="glyph_settings_sub_animations_title">Pattern</string>
-    <string name="glyph_settings_sub_animations_title_sync_enabled">Pattern (Fallback)</string>
+    <!-- Settings item: show the volume on the strips as it changes. [CHAR LIMIT=48] -->
+    <string name="pref_volume_indicator_title">Volume indicator</string>
+    <!-- Settings item summary for the volume indicator. [CHAR LIMIT=NONE] -->
+    <string name="pref_volume_indicator_summary">Audio level at a glance</string>
+    <!-- Volume screen footer: what the feature does. [CHAR LIMIT=NONE] -->
+    <string name="volume_indicator_footer">Display the current volume level with the Glyph Interface when adjusting.</string>
 
-    <string name="glyph_settings_animation_is_reversed">Reversed</string>
+    <!-- Settings category for what the device does by itself. [CHAR LIMIT=32] -->
+    <string name="pref_category_gestures">Gestures</string>
+    <!-- Settings item: silence the device while it lies face down. [CHAR LIMIT=48] -->
+    <string name="pref_flip_to_glyph_title">Flip to Glyph</string>
+    <!-- Settings item summary for Flip to Glyph. [CHAR LIMIT=NONE] -->
+    <string name="pref_flip_to_glyph_summary">Silence on demand</string>
+    <!-- Flip to Glyph screen footer: what the feature does. [CHAR LIMIT=NONE] -->
+    <string name="flip_to_glyph_footer">For quiet focus, put the device with the Glyph Interface face up on a flat surface to trigger silent, lights-only notifications and calls.</string>
 
-    <string name="glyph_settings_battery_saver_toggle_title">Follow battery saver</string>
-    <string name="glyph_settings_battery_saver_toggle_summary">Disable glyph interface when battery saver is enabled</string>
+    <!-- Settings item: keep the strips dark at set times. [CHAR LIMIT=48] -->
+    <string name="pref_schedule_title">Quiet hours</string>
+    <!-- Settings item summary for quiet hours. [CHAR LIMIT=NONE] -->
+    <string name="pref_schedule_summary">Keep the Glyph lights dark at bedtime or set times</string>
+    <!-- Quiet hours category for when the strips are dark. [CHAR LIMIT=32] -->
+    <string name="pref_category_timing">Timing</string>
+    <!-- Quiet hours setting: what decides when the strips are dark. [CHAR LIMIT=48] -->
+    <string name="pref_schedule_mode_title">Schedule</string>
+    <!-- Quiet hours schedule: never. [CHAR LIMIT=48] -->
+    <string name="schedule_mode_none">None</string>
+    <!-- Quiet hours schedule: while Bedtime mode is on. [CHAR LIMIT=48] -->
+    <string name="schedule_mode_bedtime">During Bedtime mode</string>
+    <!-- Quiet hours schedule: between times the user sets. [CHAR LIMIT=48] -->
+    <string name="schedule_mode_custom">At set times</string>
+    <!-- Quiet hours item: opens the system's Bedtime mode settings. [CHAR LIMIT=48] -->
+    <string name="pref_schedule_bedtime_title">Bedtime mode</string>
+    <!-- Quiet hours item summary for Bedtime mode. [CHAR LIMIT=NONE] -->
+    <string name="pref_schedule_bedtime_summary">Follows when Bedtime mode turns on</string>
+    <!-- Quiet hours item: when the strips go dark. [CHAR LIMIT=48] -->
+    <string name="pref_schedule_start_title">Start time</string>
+    <!-- Quiet hours item: when the strips light again. [CHAR LIMIT=48] -->
+    <string name="pref_schedule_end_title">End time</string>
+    <!-- Quiet hours item: opens the screen that sets the times and days. [CHAR LIMIT=48] -->
+    <string name="pref_schedule_hours_title">Set times</string>
+    <!-- Quiet hours item summary: the times, then the days they run on. [CHAR LIMIT=NONE] -->
+    <string name="schedule_hours_summary"><xliff:g example="10:00 PM" id="start">%1$s</xliff:g> to <xliff:g example="7:00 AM" id="end">%2$s</xliff:g>, <xliff:g example="Every day" id="days">%3$s</xliff:g></string>
+    <!-- Quiet hours days summary when every day is chosen. [CHAR LIMIT=32] -->
+    <string name="schedule_every_day">Every day</string>
+    <!-- Quiet hours days summary when no day is chosen. [CHAR LIMIT=32] -->
+    <string name="schedule_no_days">No days</string>
+    <!-- Set times screen footer: what the times do. [CHAR LIMIT=NONE] -->
+    <string name="schedule_hours_footer">The Glyph lights stay dark between these times, on the days you choose.</string>
+    <!-- Quiet hours: how long the set times last, in hours and minutes. [CHAR LIMIT=32] -->
+    <string name="schedule_duration"><xliff:g example="10" id="hours">%1$d</xliff:g> hr, <xliff:g example="20" id="minutes">%2$d</xliff:g> min</string>
+    <!-- Quiet hours category for Do Not Disturb. [CHAR LIMIT=32] -->
+    <string name="pref_category_schedule_dnd">Do Not Disturb</string>
+    <!-- Quiet hours item: keep the strips dark while Do Not Disturb is on. [CHAR LIMIT=48] -->
+    <string name="pref_schedule_dnd_title">Follow Do Not Disturb</string>
+    <!-- Quiet hours item summary for following Do Not Disturb. [CHAR LIMIT=NONE] -->
+    <string name="pref_schedule_dnd_summary">Keep the Glyph lights dark while Do Not Disturb is on</string>
+    <!-- Quiet hours category for Battery Saver. [CHAR LIMIT=32] -->
+    <string name="pref_category_schedule_battery_saver">Battery Saver</string>
+    <!-- Quiet hours item: keep the strips dark while Battery Saver is on. [CHAR LIMIT=48] -->
+    <string name="pref_schedule_battery_saver_title">Follow Battery Saver</string>
+    <!-- Quiet hours item summary for following Battery Saver. [CHAR LIMIT=NONE] -->
+    <string name="pref_schedule_battery_saver_summary">Keep the Glyph lights dark while Battery Saver is on</string>
+    <!-- Quiet hours screen footer: what quiet hours do. [CHAR LIMIT=NONE] -->
+    <string name="schedule_footer">Glyph lights stay dark during quiet hours, including for calls, notifications, and charging. If the Glyph torch is on, it turns off until quiet hours end.</string>
+    <string-array name="schedule_mode_entries">
+        <item>@string/schedule_mode_none</item>
+        <item>@string/schedule_mode_bedtime</item>
+        <item>@string/schedule_mode_custom</item>
+    </string-array>
+    <string-array name="schedule_mode_values" translatable="false">
+        <item>none</item>
+        <item>bedtime</item>
+        <item>custom</item>
+    </string-array>
 
-    <string name="glyph_settings_charging_title">Charging</string>
-    <string name="glyph_settings_charging_level_title">Battery level</string>
-    <string name="glyph_settings_charging_level_summary">Show battery level when plugging in</string>
-    <string name="glyph_settings_charging_powershare_title">Reverse wireless charging</string>
-    <string name="glyph_settings_charging_powershare_summary">Show an animation when reverse wireless charging is detected</string>
+    <!-- Settings category for what is left, which is quiet hours and music. [CHAR LIMIT=32] -->
+    <string name="pref_category_more">More</string>
+    <!-- Settings item: light the strips in time with what is playing. [CHAR LIMIT=48] -->
+    <string name="pref_music_visualizer_title">Music visualization</string>
+    <!-- Settings item summary for music visualization. [CHAR LIMIT=NONE] -->
+    <string name="pref_music_visualizer_summary">Give life to the party</string>
+    <!-- Music visualization screen footer: what the feature does. [CHAR LIMIT=NONE] -->
+    <string name="music_visualizer_footer">The Glyph Interface lights up in sync to music played through the speakers.</string>
 
-    <string name="glyph_settings_animations_live_preview_summary_playing">Now Playing...</string>
-    <string name="glyph_settings_animations_live_preview_title">Live Preview</string>
-    <string name="glyph_settings_animations_live_preview_summary">Preview selected animation on Glyphs with sound</string>
-    <string name="glyph_settings_current_glyph_preview_title">Current Glyph animation</string>
-    <string name="glyph_settings_current_glyph_preview_summary">Preview current synced ringtone animation with sound</string>
-    <string name="glyph_settings_current_glyph_preview_summary_notif">Preview current synced notification animation with sound</string>
-    <string name="glyph_settings_animations_live_preview_summary_sync">Preview current synced animation on Glyphs with sound</string>
-    <string name="glyph_settings_animations_live_preview_summary_playing_tap_to_stop">Playing preview with sound... (tap to stop)</string>
+    <!-- Settings item: asks to add the screen's tile to Quick Settings. [CHAR LIMIT=48] -->
+    <string name="pref_add_tile_title">Add to Quick Settings</string>
+    <!-- Toast shown when the tile asked for is already in Quick Settings. [CHAR LIMIT=48] -->
+    <string name="tile_already_added">Already in Quick Settings</string>
 
-    <string name="glyph_settings_flip_title">Flip to Glyph</string>
-
-    <string name="glyph_settings_flip_toggle_title">@string/glyph_settings_flip_title</string>
-    <string name="glyph_settings_flip_toggle_summary">Show Glyphs if phone is faced down</string>
-
-    <string name="glyph_settings_flip_sub_animation_toggle_title">Play animation</string>
-    <string name="glyph_settings_flip_sub_animation_toggle_summary">Show animation once flip is detected</string>
-
-    <string name="glyph_settings_flip_sub_animations_title">Flip to glyph animation</string>
-
-    <string name="glyph_settings_flip_ringer_mode_title">Ringer mode</string>
-    <string name="glyph_settings_flip_ringer_mode_summary">Choose ringer mode for when device is flipped</string>
-
-    <string name="glyph_settings_flip_ringer_mode_follow_system">Follow system</string>
-    <string name="glyph_settings_flip_ringer_mode_vibrate">Vibrate</string>
-    <string name="glyph_settings_flip_ringer_mode_silent">Silent</string>
-    <string name="glyph_settings_flip_ringer_mode_normal">Ring</string>
-
-    <string name="glyph_settings_flip_animation_option_follow_notification">Use notification animation (forwards-reverse)</string>
-
-    <string name="glyph_settings_call_title">Calls</string>
-    <string name="glyph_settings_call_toggle_title">Call animation</string>
-    <string name="glyph_settings_call_toggle_summary">Flash LEDs on incoming calls</string>
-    <string name="glyph_settings_call_sub_toggle_title">Enable call animation</string>
-
-    <string name="glyph_settings_call_sub_title">Third-party apps</string>
-
-    <string name="glyph_settings_call_sub_contact_select_title">Contact-specific settings</string>
-    <string name="glyph_settings_call_sub_contact_select_summary">Choose a contact to set options for</string>
-
-    <string name="glyph_settings_delete_confirm_message_start">Are you sure you want to delete settings for</string>
-    <string name="glyph_settings_delete_title">Delete settings</string>
-
-    <string name="glyph_settings_call_sub_animations_title">@string/glyph_settings_sub_animations_title</string>
-
-    <string name="glyph_settings_call_ogg_sync_toggle_title">Sync with ringtone</string>
-    <string name="glyph_settings_call_ogg_sync_toggle_summary">Use animation from ringtone (when available)</string>
-
-    <string name="glyph_settings_notifs_ogg_sync_toggle_title">Sync with notification sound</string>
-    <string name="glyph_settings_notifs_ogg_sync_toggle_summary">Use animation from notification sound (when available)</string>
-
-    <string name="glyph_settings_call_additional_hint">New CSV animations can placed in /sdcard/Glyph/Call</string>
-
-    <string name="glyph_settings_notifs_title">Notifications</string>
-    <string name="glyph_settings_notifs_toggle_title">Notification animation</string>
-    <string name="glyph_settings_notifs_toggle_summary">Flash LEDs on new notifications</string>
-    <string name="glyph_settings_notifs_sub_title">Apps to allow</string>
-    <string name="glyph_settings_notifs_sub_toggle_title">Enable notification animation</string>
-    <string name="glyph_settings_notifs_sub_animations_title">@string/glyph_settings_sub_animations_title</string>
-    <string name="glyph_settings_notifs_sub_essential_title">Essential Notifications</string>
-    <string name="glyph_settings_notifs_sub_essential_summary">Essential Glyph will be displayed until Essential notifications are read or dismissed</string>
-
-    <string name="glyph_settings_notifs_additional_hint">New CSV animations can placed in /sdcard/Glyph/Notifications</string>
-
-    <string name="glyph_settings_sub_animations_reverse_toggle_title">Reverse animation</string>
-    <string name="glyph_settings_sub_animations_reverse_toggle_summary">Play animation from end to beginning</string>
-
-    <string name="glyph_settings_notifs_permission_dialog_title">Notification Access Required</string>
-    <string name="glyph_settings_notifs_permission_dialog_message">To use the Glyph Interface for notifications, you must grant notification access permissions.</string>
-
-    <string name="glyph_settings_volume_title">Volume</string>
-    <string name="glyph_settings_volume_level_toggle_title">Volume indicator</string>
-    <string name="glyph_settings_volume_level_toggle_summary">Show volume level when adjusting</string>
-
-    <string name="glyph_settings_misc_title">Miscellaneous</string>
-
-    <string name="glyph_settings_music_visualizer_title">Music Visualizer</string>
-    <string name="glyph_settings_music_visualizer_toggle_title">@string/glyph_settings_music_visualizer_title</string>
-    <string name="glyph_settings_music_visualizer_toggle_summary">DISCO LIGHTS!</string>
-
-    <string name="glyph_settings_music_visualizer_mode_title">Visualizer mode</string>
-    <string name="glyph_settings_music_visualizer_mode_beat_trigger">Beat trigger</string>
-    <string name="glyph_settings_music_visualizer_mode_band_intensity">Band intensity</string>
-    <string name="glyph_settings_music_visualizer_mode_band_intensity_inverted">Band intensity (inverted)</string>
-
-
-    <string name="glyph_settings_music_visualizer_warning_title">Conflicting Service Detected</string>
-    <string name="glyph_settings_music_visualizer_warning_message">Due to Android limitations, only one process may capture audio for session 0 \(Global\). 
-          Your current ROM has Pulse built in and will stop working when Glyph music visualizer is enabled.
-     </string>
-     <string name="glyph_settings_music_visualizer_disable_pulse">Disable Pulse</string>
-
-    <string name="glyph_settings_user_animation_incompatible">Selected animation is not compatible with this device!</string>
-    <string name="glyph_settings_user_animation_invalid">Selected animation is not valid!</string>
-    <string name="glyph_settings_user_animation_is_complex">Complex animations cannot be displayed, use Live Preview instead!</string>
-
-    <!-- QS tile -->
-    <string name="glyph_accessibility_quick_settings">Glyph</string>
-    <string name="glyph_accessibility_quick_settings_torch">Glyph torch</string>
-    <string name="glyph_accessibility_quick_settings_music_visualizer">Glyph Music Visualizer</string>
-
-    <string name="glyph_accessibility_quick_settings_flip_to_glyph">@string/glyph_settings_flip_title</string>
-
-    <string name="glyph_accessibility_quick_settings_off">Off</string>
-    <string name="glyph_accessibility_quick_settings_on">On</string>
-    <string name="glyph_accessibility_quick_settings_unavailable">Unavailable</string>
-
-    <string name="glyph_music_visualizer_pulse_toast_message">Pulse visualizer has been disabled to avoid conflicts.</string>
-
-    <!-- Glyph Schedule Settings -->
-    <string name="glyph_settings_schedule_title">Schedule Glyph</string>
-    <string name="glyph_settings_schedule_summary">Automatically disable Glyph during specified hours</string>
-    <string name="glyph_settings_schedule_enable_title">Enable Schedule</string>
-    <string name="glyph_settings_schedule_enable_summary">Automatically disable Glyph features during scheduled hours</string>
-    <string name="glyph_settings_schedule_start_time_title">Start Time</string>
-    <string name="glyph_settings_schedule_start_time_summary">Set the time when Glyph features will be disabled</string>
-    <string name="glyph_settings_schedule_end_time_title">End Time</string>
-    <string name="glyph_settings_schedule_end_time_summary">Set the time when Glyph features will be re-enabled</string>
-    <string name="glyph_settings_schedule_info_summary">Schedule will disable Glyph features except torch. Torch tile will continue to work during scheduled hours.</string>
-    <string name="glyph_settings_schedule_status_title">Current Status</string>
-    <string name="glyph_settings_schedule_status_summary">Shows whether the schedule is currently active</string>
-    <string name="glyph_settings_schedule_active">Schedule active — Glyph disabled (Torch still works)</string>
-    <string name="glyph_settings_schedule_inactive">Schedule inactive — Glyph enabled</string>
-    <string name="glyph_settings_schedule_disabled">Schedule disabled</string>
-    <string name="glyph_settings_schedule_not_active_today">⏸ Not active today</string>
-    <string name="glyph_accessibility_quick_settings_disabled">Disabled</string>
-    <string name="glyph_settings_active_days_title">Active Days</string>
-    <string name="glyph_settings_active_days_summary">Every day</string>
-    <string name="glyph_settings_active_days_dialog_title">Select Days</string>
-    <string name="glyph_settings_active_days_every_day">Every day</string>
-    <string name="glyph_settings_active_days_none">No days selected</string>
-    <string name="glyph_settings_active_days_weekdays">Weekdays (Mon-Fri)</string>
-    <string name="glyph_settings_active_days_weekends">Weekends (Sat-Sun)</string>
-
-    <string name="glyph_settings_progress_title">Progress</string>
-    <string name="glyph_settings_progress_toggle_title">Glyph progress</string>
-    <string name="glyph_settings_progress_toggle_summary">Show progress bar when Glyph is active</string>
-    <string name="glyph_settings_progress_media_toggle_title">Media progress</string>
-    <string name="glyph_settings_progress_media_toggle_summary">Show progress bar when media is playing</string>
-    <string name="glyph_settings_progress_media_app_whitelist_title">Media applications</string>
-    <string name="glyph_settings_progress_media_app_whitelist_summary">Choose apps to be used for media progress</string>
-
-    <string name="glyph_settings_red_led_title">Red LED</string>
-
-    <string name="glyph_settings_red_led_mode_title">LED Mode</string>
-
-    <string name="glyph_settings_mic_activity_toggle_title">Microphone activity</string>
-    <string name="glyph_settings_mic_activity_toggle_summary">Turn on the red LED when an app is using the microphone</string>
-
-    <string name="glyph_settings_mic_activity_whitelist_title">Mic apps</string>
-    <string name="glyph_settings_mic_activity_whitelist_summary">Choose apps to monitor for mic usage</string>
-
-    <!-- Tone helper -->
-    <string name="notification_channel_title">Tone changes</string>
-    <string name="notification_channel_description">Notify on animation changes from OGG files</string>
-
-    <string name="sound_changed_notification_message">Animation imported!</string>
-
-    <string name="ringtone_changed_notification_title">New ringtone set</string>
-    <string name="notification_sound_changed_notification_title">Notification sound changed</string>
-    
-
-    <!-- Utilities -->
-    <string name="glyph_settings_utilities_title">Utilities</string>
-    <string name="glyph_settings_utilities_summary">Extra glyph tools</string>
-    <string name="glyph_settings_utilities_ogg_title">OGG</string>
-
-    <string name="glyph_settings_utilities_export_csv_from_ogg_title">Export CSV from OGG</string>
-    <string name="glyph_settings_utilities_export_csv_from_ogg_summary">Get a CSV file from animation OGG</string>
-    <string name="glyph_settings_utilities_read_ogg_title">Read OGG</string>
-    <string name="glyph_settings_utilities_read_ogg_summary">Show metadata found in an ogg file</string>
-
-    <string name="ogg_csv_export_notification_animation">Save as notification animation</string>
-    <string name="ogg_csv_export_call_animation">Save as call animation</string>
-    <string name="ogg_csv_export_complete_message_start">File saved to:</string>
-
-    <string name="glyph_utilities_validate_csv_title">Validate CSV</string>
-    <string name="glyph_utilities_validate_csv_summary">Check a CSV file for errors</string>
-
-    <string name="glyph_utilities_csv_title">CSV</string>
-
-    <string name="glyph_ogg_metadata_title">Ogg info</string>
-
-    <string name="metadata_device">Device</string>
-
-    <string name="metadata_device_phone1_proper">Phone (1)</string>
-    <string name="metadata_device_phone2_proper">Phone (2)</string>
-    <string name="metadata_device_phone2a_proper">Phone (2a)</string>
-    <string name="metadata_device_phone3a_proper">Phone (3a)</string>
-
-    <string name="metadata_device_unsupported">Unsupported</string>
-    <string name="metadata_pattern_duration">Animation duration</string>
-    <string name="metadata_filename">Filename</string>
-
-    <string name="file_export_complete_message">File saved successfully!</string>
-    <string name="file_already_exported_summary">File already saved</string>
-
-    <!-- Auto Generator -->
-    <string name="glyph_settings_utilities_generator_title">Generator</string>
-    <string name="glyph_utilities_auto_generate_title">Auto Generator</string>
-    <string name="glyph_utilities_auto_generate_summary">Generate Glyph animations from any audio</string>
-    <string name="glyph_generator_dialog_title">Glyph Auto Generator</string>
-    <string name="glyph_generator_mode_beats">Beats (Heavy rhythm sweep)</string>
-    <string name="glyph_generator_mode_smooth">Smooth (Anti-flicker reactive)</string>
-    <string name="glyph_generator_mode_frequency">Frequency (7-band spectrum)</string>
-    <string name="glyph_generator_mode_pattern">Pattern (Dynamic choreography)</string>
-    <string name="glyph_generator_action_generate">Generate</string>
-    <string name="glyph_generator_action_preview">Live Preview</string>
-    <string name="glyph_generator_action_apply_call">Set as Ringtone</string>
-    <string name="glyph_generator_action_apply_notif">Set as Notification</string>
-    <string name="glyph_generator_action_export_csv">Export CSV</string>
-    <string name="glyph_generator_generating">Analyzing audio and generating 60 FPS Glyph frames...</string>
-    <string name="glyph_generator_success">Generated %1$d frames (%2$ds)</string>
-    <string name="glyph_generator_applied_call">Set as active Call Glyph animation!</string>
-    <string name="glyph_generator_applied_notif">Set as active Notification Glyph animation!</string>
-    <string name="glyph_generator_source_title">Select Audio Source</string>
-    <string name="glyph_generator_source_ringtone">Current Ringtone (%s)</string>
-    <string name="glyph_generator_source_notif">Current Notification (%s)</string>
-    <string name="glyph_generator_source_file">Choose Audio File…</string>
-    <string name="glyph_generator_source_default_ringtone">Ringtone</string>
-    <string name="glyph_generator_source_default_notif">Notification</string>
-    <string name="glyph_generator_no_ringtone">No ringtone set</string>
-    <string name="glyph_generator_no_notif">No notification sound set</string>
+    <!-- Quick settings tile label: the strips. [CHAR LIMIT=32] -->
+    <string name="tile_glyph_label">Glyph</string>
+    <!-- Quick settings tile label: the strips as a torch. [CHAR LIMIT=32] -->
+    <string name="tile_torch_label">Glyph torch</string>
+    <!-- Quick settings tile label: the strips following the music. [CHAR LIMIT=32] -->
+    <string name="tile_music_visualizer_label">Music visualizer</string>
+    <!-- Spoken state of a quick settings tile that is on. [CHAR LIMIT=24] -->
+    <string name="tile_on_content_description">On</string>
+    <!-- Spoken state of a quick settings tile that is off. [CHAR LIMIT=24] -->
+    <string name="tile_off_content_description">Off</string>
 
 </resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:settings="http://schemas.android.com/apk/res-auto"
+    android:title="@string/pref_music_visualizer_title">
+
+    <com.android.settingslib.widget.IllustrationPreference
+        android:key="glyph_music_visualizer_preview"
+        settings:lottie_rawRes="@raw/glyph_music_visualizer_preview" />
+
+    <com.android.settingslib.widget.MainSwitchPreference
+        android:defaultValue="false"
+        android:key="glyph_settings_music_visualizer_toggle"
+        android:title="@string/pref_music_visualizer_title" />
+
+    <co.aospa.glyph.ui.preference.AddTilePreference
+        android:icon="@drawable/ic_add_24dp"
+        android:key="glyph_settings_music_visualizer_add_tile"
+        android:title="@string/pref_add_tile_title"
+        settings:tileIcon="@drawable/ic_graphic_eq_24dp"
+        settings:tileLabel="@string/tile_music_visualizer_label"
+        settings:tileService=".tiles.MusicVisualizerTileService" />
+
+    <com.android.settingslib.widget.FooterPreference
+        android:key="glyph_settings_music_visualizer_footer"
+        android:title="@string/music_visualizer_footer" />
+
+</PreferenceScreen>

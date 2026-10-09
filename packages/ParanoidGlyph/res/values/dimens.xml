@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<resources>
+
+    <!-- The status badge beside the device drawing. -->
+    <dimen name="preview_badge_size">56dp</dimen>
+    <dimen name="preview_badge_icon_size">32dp</dimen>
+    <dimen name="preview_badge_gap">21dp</dimen>
+    <dimen name="preview_badge_top">6dp</dimen>
+
+</resources>

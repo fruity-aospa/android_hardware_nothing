@@ -1,35 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2024 Paranoid Android
+  ~ SPDX-FileCopyrightText: The LineageOS Project
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<resources>
 
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
+    <!-- Which device's strips these resources describe. -->
+    <string name="config_device" translatable="false">phone3a</string>
 
-          http://www.apache.org/licenses/LICENSE-2.0
+    <!-- Highest level the strips accept. -->
+    <integer name="config_brightnessMax" translatable="false">4095</integer>
 
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
--->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-
-    <!-- Device -->
-    <string name="glyph_settings_device" translatable="false">phone3a</string>
-
-    <!-- Brighntess -->
-    <integer name="glyph_settings_brightness_max" translatable="false">255</integer>
-    <integer-array name="glyph_settings_brightness_levels" translatable="false">
-        <item>31</item>
-        <item>62</item>
-        <item>93</item>
-        <item>124</item>
-        <item>155</item>
-        <item>186</item>
-        <item>217</item>
-        <item>@integer/glyph_settings_brightness_max</item>
+    <!-- The levels the brightness slider steps through, dimmest first. -->
+    <integer-array name="config_brightnessLevels" translatable="false">
+        <item>835</item>
+        <item>1397</item>
+        <item>2071</item>
     </integer-array>
+
+    <!-- The levels on a white shell, which diffuses more light. -->
+    <integer-array name="config_brightnessLevelsWhite" translatable="false">
+        <item>979</item>
+        <item>1365</item>
+        <item>2232</item>
+    </integer-array>
+
+    <!-- The wake-up sensor that reports the screen facing down. -->
+    <string name="config_flipSensorType" translatable="false">android.sensor.screen_upward</string>
+
+    <!-- The glyphs of the device drawing. -->
+    <array name="config_glyphViews" translatable="false">
+        <item>@id/preview_device_a1</item>
+        <item>@id/preview_device_b1</item>
+        <item>@id/preview_device_a2</item>
+    </array>
+
+    <!-- The channels each glyph of the drawing shows, in the order of the glyphs above. -->
+    <string-array name="config_glyphViewZones" translatable="false">
+        <item>0-19</item> <!-- a1 -->
+        <item>20-30</item> <!-- b1 -->
+        <item>31-35</item> <!-- a2 -->
+    </string-array>
+
+    <!-- How many levels a csv line may carry, one entry per width accepted. -->
+    <integer-array name="config_patternLengths" translatable="false">
+        <item>36</item>
+    </integer-array>
+
+    <!-- The channels each band of the music visualizer lights, in the order its tuning lists them. -->
+    <string-array name="config_visualizerZones" translatable="false">
+        <item>0-19</item> <!-- a1 -->
+        <item>20-30</item> <!-- b1 -->
+        <item>31-35</item> <!-- a2 -->
+    </string-array>
+
+    <!-- How the music visualizer reacts to sound. Each array below has one entry for each band,
+         in the order of the visualizer zones above. -->
+
+    <!-- The fft buckets each band averages, a bucket or a range of them. -->
+    <string-array name="config_visualizerBuckets" translatable="false">
+        <item>30-44</item> <!-- a1 -->
+        <item>0</item> <!-- b1 -->
+        <item>15-22</item> <!-- a2 -->
+    </string-array>
+
+    <!-- How long, in milliseconds, each band's ceiling holds after a beat. -->
+    <integer-array name="config_visualizerDecayWindows" translatable="false">
+        <item>200</item> <!-- a1 -->
+        <item>300</item> <!-- b1 -->
+        <item>500</item> <!-- a2 -->
+    </integer-array>
+
+    <!-- The part of its ceiling a value has to reach to count as a beat. -->
+    <array name="config_visualizerTriggerRatios" translatable="false">
+        <item>0.7</item> <!-- a1 -->
+        <item>0.75</item> <!-- b1 -->
+        <item>0.7</item> <!-- a2 -->
+    </array>
+
+    <!-- What each band's brightness is multiplied by each capture between beats. -->
+    <array name="config_visualizerTriggerDecays" translatable="false">
+        <item>0.66</item> <!-- a1 -->
+        <item>0.56</item> <!-- b1 -->
+        <item>0.66</item> <!-- a2 -->
+    </array>
+
+    <!-- What each band's ceiling is multiplied by each capture once it falls. -->
+    <array name="config_visualizerCeilingDecays" translatable="false">
+        <item>0.63</item> <!-- a1 -->
+        <item>0.95</item> <!-- b1 -->
+        <item>0.65</item> <!-- a2 -->
+    </array>
+
+    <!-- How long, in milliseconds, a band waits after a beat before it can beat again. -->
+    <integer name="config_visualizerRetrigger" translatable="false">180</integer>
+
+    <!-- The channels an essential notification holds lit, the whole of B. -->
+    <string-array name="config_essentialZones" translatable="false">
+        <item>20-30</item>
+    </string-array>
+
+    <!-- The ringtone a call plays until the user chooses another. -->
+    <string name="config_defaultCallAnimation" translatable="false">Dolphin</string>
+
+    <!-- The animation a notification plays until the user chooses another. -->
+    <string name="config_defaultNotificationAnimation" translatable="false">Sharp</string>
 
 </resources>

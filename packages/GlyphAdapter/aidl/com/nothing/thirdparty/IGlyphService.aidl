@@ -1,22 +1,25 @@
-//
-// Copyright (C) 2025 The LineageOS Project
-// Copyright (C) 2026 Paranoid Android
-//
-// SPDX-License-Identifier: Apache-2.0
-//
+/*
+ * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: Paranoid Android
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 package com.nothing.thirdparty;
 
+/**
+ * The service that apps built with the Glyph SDK bind to.
+ *
+ * The SDK calls these methods by their position, so only append new ones.
+ */
 interface IGlyphService {
-    // Wire transaction order; append, never insert. Matrix unsupported on Phone (1)/(2)/(2a).
-    void setFrameColors(in int[] iArray);
+    void setFrameColors(in int[] levels);
     void openSession();
     void closeSession();
-    boolean register(in String str);
-    boolean registerSDK(in String str1, in String str2);
-    boolean registerMatrixSDK(in String str);
-    void setMatrixColors(in int[] iArray);
+    boolean register(in String name);
+    boolean registerSDK(in String name, in String key);
+    boolean registerMatrixSDK(in String name);
+    void setMatrixColors(in int[] levels);
     void setGlyphMatrixTimeout(boolean active);
-    void setAppMatrixColors(in int[] iArray);
+    void setAppMatrixColors(in int[] levels);
     void closeAppMatrix();
 }

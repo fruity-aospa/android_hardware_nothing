@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     SPDX-FileCopyrightText: 2025 The LineageOS Project
-     SPDX-FileCopyrightText: 2026 Paranoid Android
-     SPDX-License-Identifier: Apache-2.0
--->
+  ~ SPDX-FileCopyrightText: The LineageOS Project
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nothing.thirdparty"
     android:versionCode="1"
@@ -13,7 +13,8 @@
     <permission android:name="com.nothing.ketchum.permission.ENABLE"/>
 
     <application
-        android:label="GlyphAdapter"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_label"
         android:persistent="true"
         android:defaultToDeviceProtectedStorage="true"
         android:enableOnBackInvokedCallback="true"
@@ -25,7 +26,6 @@
             android:permission="com.nothing.ketchum.permission.ENABLE">
             <intent-filter>
                 <action android:name="com.nothing.thirdparty.bind_glyphservice"/>
-                <action android:name="com.nothing.thirdparty.IGlyphService"/>
             </intent-filter>
         </service>
 

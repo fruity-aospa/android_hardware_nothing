@@ -1,80 +1,96 @@
+/*
+ * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: Paranoid Android
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package co.aospa.glyph.Services
 
 import android.app.Service
-import android.content.Context
 import android.content.Intent
+import android.os.Binder
+import android.os.Process
 import android.os.IBinder
-import android.os.PowerManager
-import android.util.Log
-import co.aospa.glyph.Manager.AnimationManager
-import co.aospa.glyph.Manager.StatusManager
+import co.aospa.glyph.system.GlyphStream
+import co.aospa.glyph.util.GlyphLog
+import co.aospa.glyph.util.glyph
 import com.nothing.thirdparty.IGlyphService
 
-// Flip to true to trace frame payloads from third-party SDK clients.
-private const val DEBUG = false
-
+/**
+ * Lets apps drive the strips through the glyph sdk, for as long as one is bound through the adapter
+ * and the glyphs are enabled.
+ */
 class ThirdPartyService : Service() {
-
-    private var wakeLock: PowerManager.WakeLock? = null
-    private val wakeLockLock = Any()
-    private val binder = object : IGlyphService.Stub() {
-        override fun setFrameColors(iArray: IntArray?) {
-            if (DEBUG) Log.d("ThirdPartyService", "received data: ${iArray.contentToString()}")
-            AnimationManager.updateLedFrame(iArray)
-        }
-
-        override fun openSession() {
-            Log.d("ThirdPartyService", "openSession")
-            acquireWakeLock()
-            StatusManager.setAnimationActive(true)
-        }
-
-        override fun closeSession() {
-            Log.d("ThirdPartyService", "closeSession")
-            StatusManager.setAnimationActive(false)
-            AnimationManager.clearLEDs()
-            releaseWakeLock()
-        }
-
-        override fun register(str: String) = true
-        override fun registerSDK(str1: String, str2: String) = true
-
-        override fun registerMatrixSDK(str: String) = false
-
-        override fun setMatrixColors(iArray: IntArray?) {}
-
-        override fun setGlyphMatrixTimeout(active: Boolean) {}
-
-        override fun setAppMatrixColors(iArray: IntArray?) {}
-
-        override fun closeAppMatrix() {}
+    companion object {
+        private const val TAG = "GlyphThirdPartyService"
     }
 
-    override fun onBind(intent: Intent?): IBinder {
-        return binder
-    }
-
-    private fun acquireWakeLock() {
-        synchronized(wakeLockLock) {
-            if (wakeLock == null) {
-                val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-                wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ThirdPartyService::WakeLock")
-                wakeLock?.acquire(60000)
-                Log.d("ThirdPartyService", "WakeLock acquired with safety timeout")
-            }
+    private fun enforceAdapterCaller() {
+        if (Binder.getCallingUid() != Process.SYSTEM_UID) {
+            throw SecurityException("Only the system Glyph adapter may drive this endpoint")
         }
     }
 
-    private fun releaseWakeLock() {
-        synchronized(wakeLockLock) {
-            val lock = wakeLock
-            if (lock != null) {
-                if (lock.isHeld) {
-                    lock.release()
+    private val service =
+        object : IGlyphService.Stub() {
+            override fun setFrameColors(levels: IntArray?) {
+                enforceAdapterCaller()
+                if (!glyph.preferences.isEnabled) return
+                GlyphLog.d(TAG) { "Frame of ${levels.contentToString()}" }
+                levels?.let { frame ->
+                    glyph.animator.setFrame(
+                        GlyphStream.CLIENT,
+                        frame.map(Int::toFloat).toFloatArray(),
+                    )
                 }
-                wakeLock = null
-                Log.d("ThirdPartyService", "WakeLock released")
             }
+
+            override fun openSession() {
+                enforceAdapterCaller()
+                GlyphLog.d(TAG) { "Session opened" }
+            }
+
+            override fun closeSession() {
+                enforceAdapterCaller()
+                GlyphLog.d(TAG) { "Session closed" }
+                glyph.animator.endFrames(GlyphStream.CLIENT)
+            }
+
+            override fun register(name: String): Boolean {
+                enforceAdapterCaller()
+                return true
+            }
+
+            override fun registerSDK(name: String, key: String): Boolean {
+                enforceAdapterCaller()
+                return true
+            }
+
+            // The matrix is the dot display of a later phone, which this is not.
+            override fun registerMatrixSDK(name: String): Boolean {
+                enforceAdapterCaller()
+                return false
+            }
+
+            override fun setMatrixColors(levels: IntArray?) { enforceAdapterCaller() }
+
+            override fun setGlyphMatrixTimeout(active: Boolean) { enforceAdapterCaller() }
+
+            override fun setAppMatrixColors(levels: IntArray?) { enforceAdapterCaller() }
+
+            override fun closeAppMatrix() { enforceAdapterCaller() }
         }
+
+    override fun onBind(intent: Intent?): IBinder = service
+
+    override fun onDestroy() {
+        glyph.animator.endFrames(GlyphStream.CLIENT)
+        super.onDestroy()
+    }
+
+    // The adapter, and every client behind it, is gone.
+    override fun onUnbind(intent: Intent?): Boolean {
+        glyph.animator.endFrames(GlyphStream.CLIENT)
+        return super.onUnbind(intent)
     }
 }

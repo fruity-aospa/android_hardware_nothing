@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:settings="http://schemas.android.com/apk/res-auto"
+    android:title="@string/pref_notification_animation_title">
+
+    <co.aospa.glyph.ui.preference.GlyphAnimationPreference
+        android:key="glyph_settings_notifs_sub_preview"
+        settings:badgeIcon="@drawable/ic_badge_notifications"
+        android:selectable="false" />
+
+    <com.android.settingslib.widget.MainSwitchPreference
+        android:key="glyph_settings_notifs_sub_toggle"
+        android:title="@string/pref_notification_animation_enable_title" />
+
+    <PreferenceCategory
+        android:key="glyph_settings_notifs_sub_animation_category"
+        android:title="@string/pref_category_animation">
+
+        <ListPreference
+            android:defaultValue="@string/config_defaultNotificationAnimation"
+            android:dependency="glyph_settings_notifs_sub_toggle"
+            android:icon="@drawable/ic_animation_24dp"
+            android:key="glyph_settings_notifs_sub_animations"
+            android:summary="%s"
+            android:title="@string/pref_notification_animation_pattern_title" />
+
+        <com.android.settingslib.widget.ButtonPreference
+            android:dependency="glyph_settings_notifs_sub_toggle"
+            android:icon="@drawable/ic_play_arrow_24dp"
+            android:key="glyph_settings_notifs_sub_play"
+            android:title="@string/pref_animation_play_title"
+            settings:buttonPreferenceSize="large"
+            settings:buttonPreferenceType="tonal" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="glyph_settings_notifs_sub_apps_category"
+        android:title="@string/pref_category_apps">
+
+        <Preference
+            android:dependency="glyph_settings_notifs_sub_toggle"
+            android:icon="@drawable/ic_apps_24dp"
+            android:key="glyph_settings_notifs_sub"
+            android:summary="@string/pref_allowed_apps_summary"
+            android:title="@string/pref_allowed_apps_title">
+            <intent android:action="co.aospa.glyph.action.APPS_SETTINGS" />
+        </Preference>
+
+        <Preference
+            android:dependency="glyph_settings_notifs_sub_toggle"
+            android:icon="@drawable/ic_star_24dp"
+            android:key="glyph_settings_notifs_sub_essential"
+            android:summary="@string/pref_essential_apps_summary"
+            android:title="@string/pref_essential_apps_title">
+            <intent android:action="co.aospa.glyph.action.ESSENTIAL_SETTINGS" />
+        </Preference>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

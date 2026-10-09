@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ SPDX-FileCopyrightText: Paranoid Android
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/pref_allowed_apps_title">
+
+    <!-- One switch per app, added by the screen itself. -->
+    <PreferenceCategory android:key="glyph_settings_notifs_sub" />
+
+    <com.android.settingslib.widget.FooterPreference
+        android:key="glyph_settings_notifs_sub_footer"
+        android:title="@string/allowed_apps_footer" />
+
+</PreferenceScreen>
