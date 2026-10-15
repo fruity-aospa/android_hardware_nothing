@@ -25,8 +25,12 @@ cc_binary {
         "liblog",
         "libbase",
         "libbinder_ndk",
-        "libaacvibrator",
-        "libics_haptic",
         "android.hardware.vibrator-V2-ndk",
-    ],
+    ] + select(soong_config_variable("nothing_vibrator", "enable_deps"), {
+        true: [
+            "libaacvibrator",
+            "libics_haptic",
+        ],
+        default: [],
+    }),
 }
