@@ -66,30 +66,28 @@ public class OTGModeSwitch extends Service implements OnPreferenceChangeListener
     private final BroadcastReceiver chargingReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Battery status broadcasts are frequent and can be delivered
-            // independently of a cable transition. Only disable host OTG
-            // when the system reports that external power was connected.
-            if (Intent.ACTION_POWER_CONNECTED.equals(intent.getAction())) {
-                disableOTGIfEnabled();
-            }
-
-            int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-            switch (status) {
-                case BatteryManager.BATTERY_STATUS_CHARGING:
-                case BatteryManager.BATTERY_STATUS_FULL:
-                case BatteryManager.BATTERY_STATUS_NOT_CHARGING:
-                    deviceCharging = true;
-                    prefs.edit().putBoolean(DeviceExtras.KEY_OTG_SWITCH, false).apply();
-                    break;
-                case BatteryManager.BATTERY_STATUS_DISCHARGING:
-                    deviceCharging = false;
-                    break;
-            }
-            for (Listener l : listeners) {
-                l.onChargingStateChanged(deviceCharging);
+            String action = intent.getAction();
+            if (Intent.ACTION_POWER_CONNECTED.equals(action)) {
+                onPowerChanged(true);
+            } else if (Intent.ACTION_POWER_DISCONNECTED.equals(action)) {
+                onPowerChanged(false);
             }
         }
     };
+
+    private void onPowerChanged(boolean charging) {
+        deviceCharging = charging;
+
+        if (charging && isSupported()
+                && FileUtils.getFileValueAsBoolean(FILE, false, "3", "4")) {
+            setOTGMode(false);
+            prefs.edit().putBoolean(DeviceExtras.KEY_OTG_SWITCH, false).apply();
+        }
+
+        for (Listener l : listeners) {
+            l.onChargingStateChanged(deviceCharging);
+        }
+    }
 
     public static final String FILE = "/proc/charger/nt_otg_enable";
 
@@ -104,27 +102,15 @@ public class OTGModeSwitch extends Service implements OnPreferenceChangeListener
     static void setOTGMode(boolean newState) {
         FileUtils.writeProcNode(FILE, newState ? "3" : "4");
     }
-
-    private static void disableOTGIfEnabled() {
-        // Reapplying OTG-off while USB is connected can disturb the Type-C
-        // and data connection. Only disable when the controller confirms
-        // OTG is enabled; if the read fails, leave the state alone.
-        String currentState = FileUtils.readLine(FILE);
-        if ("3".equals(currentState)) {
-            setOTGMode(false);
-        }
-    }
     
     private void setReceiver(boolean enable) {
-        if (enable && receiverRegistered) return;
-        if (enable) {
+        if (enable && !receiverRegistered) {
             IntentFilter filter = new IntentFilter();
             filter.addAction(Intent.ACTION_POWER_CONNECTED);
             filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
-            filter.addAction(Intent.ACTION_BATTERY_CHANGED);
             registerReceiver(chargingReceiver, filter);
             receiverRegistered = true;
-        } else {
+        } else if (!enable && receiverRegistered) {
             unregisterReceiver(chargingReceiver);
             receiverRegistered = false;
         }
@@ -139,12 +125,17 @@ public class OTGModeSwitch extends Service implements OnPreferenceChangeListener
         Boolean enabled = (Boolean) newValue;
         setOTGMode(enabled);
         return true;
-    }
+    }   
 
     @Override
     public void onCreate() {
         Constants.CONTEXT = this.getApplicationContext();
         prefs = PreferenceManager.getDefaultSharedPreferences(Constants.CONTEXT);
+        Intent battery = registerReceiver(null,
+                new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int plugged = battery != null
+                ? battery.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) : 0;
+        deviceCharging = plugged != 0;
         setReceiver(true);
     }
 
