@@ -40,12 +40,28 @@ class PickupSensor(
         if (event.values[0] == sensorValue) {
             if (Utils.isPickUpSetToWake(context)) {
                 wakeLock.acquire(WAKELOCK_TIMEOUT_MS)
-                powerManager.wakeUpWithProximityCheck(
-                    SystemClock.uptimeMillis(),
-                    PowerManager.WAKE_REASON_GESTURE,
-                    TAG,
-                    Display.DEFAULT_DISPLAY,
-                )
+                try {
+                    val method = powerManager.javaClass.getMethod(
+                        "wakeUpWithProximityCheck",
+                        Long::class.javaPrimitiveType,
+                        Int::class.javaPrimitiveType,
+                        String::class.java,
+                        Int::class.javaPrimitiveType,
+                    )
+                    method.invoke(
+                        powerManager,
+                        SystemClock.uptimeMillis(),
+                        PowerManager.WAKE_REASON_GESTURE,
+                        TAG,
+                        Display.DEFAULT_DISPLAY,
+                    )
+                } catch (e: Exception) {
+                    powerManager.wakeUp(
+                        SystemClock.uptimeMillis(),
+                        PowerManager.WAKE_REASON_GESTURE,
+                        TAG,
+                    )
+                }
             } else {
                 Utils.launchDozePulse(context)
             }
