@@ -363,8 +363,10 @@ public class AnimationSettingsFragment
                     appListCategory = findPreference(Constants.GLYPH_CALL_SUB_CATEGORY);
                     inflateAppLists();
 
-                    // mToneSyncSwitch = findPreference(Constants.GLYPH_CALL_TONE_SYNC);
-                    // mToneSyncSwitch.setOnPreferenceChangeListener(this);
+                    mToneSyncSwitch = findPreference(Constants.GLYPH_CALL_TONE_SYNC);
+                    if (mToneSyncSwitch != null) {
+                        mToneSyncSwitch.setOnPreferenceChangeListener(this);
+                    }
 
                 }
 
@@ -391,6 +393,10 @@ public class AnimationSettingsFragment
                 mGlyphFlipAnimationSwitch = findPreference(Constants.GLYPH_FLIP_SUB_ANIMATION_ENABLE);
                 mGlyphFlipAnimationSwitch.setOnPreferenceChangeListener(this);
 
+                Preference animListPref = findPreference(Constants.GLYPH_FLIP_SUB_ANIMATIONS);
+                if (animListPref != null) animListPref.setVisible(false);
+                Preference reversePref = findPreference(Constants.GLYPH_FLIP_REVERSE_ANIMATION_ENABLE);
+                if (reversePref != null) reversePref.setVisible(false);
             }
         }
     }
@@ -401,11 +407,17 @@ public class AnimationSettingsFragment
 
         boolean isPlayable = true;
 
-        shouldAlternate = fragmentType.equals(FRAGMENT_TYPE_FLIP)
-                && mListPreference.getValue().equals(Constants.GLYPH_NOTIF_ANIMATION_ALTERNATE);
-        boolean shouldReverse = mReverseAnimationSwitch.isChecked() && !shouldAlternate;
+        shouldAlternate = false;
+        boolean shouldReverse = !fragmentType.equals(FRAGMENT_TYPE_FLIP)
+                && mReverseAnimationSwitch != null && mReverseAnimationSwitch.isChecked();
 
-        mReverseAnimationSwitch.setVisible(!shouldAlternate);
+        if (mReverseAnimationSwitch != null) {
+            if (fragmentType.equals(FRAGMENT_TYPE_FLIP)) {
+                mReverseAnimationSwitch.setVisible(false);
+            } else {
+                mReverseAnimationSwitch.setVisible(!shouldAlternate);
+            }
+        }
 
         if (mListPreference.getValue().startsWith(userAnimationPrefix)) {
             String animationName = mListPreference.getValue();
@@ -435,14 +447,21 @@ public class AnimationSettingsFragment
         final String preferenceKey = preference.getKey();
 
         if (preferenceKey.equals(animationListKey)) {
+            AnimationManager.clearCallAnimationCache();
             String animationName = newValue.toString();
             boolean isPlayable = true;
 
-            shouldAlternate = fragmentType.equals(FRAGMENT_TYPE_FLIP)
-                    && animationName.equals(Constants.GLYPH_NOTIF_ANIMATION_ALTERNATE);
-            boolean shouldReverse = mReverseAnimationSwitch.isChecked() && !shouldAlternate;
+            shouldAlternate = false;
+            boolean shouldReverse = !fragmentType.equals(FRAGMENT_TYPE_FLIP)
+                    && mReverseAnimationSwitch != null && mReverseAnimationSwitch.isChecked();
 
-            mReverseAnimationSwitch.setVisible(!shouldAlternate);
+            if (mReverseAnimationSwitch != null) {
+                if (fragmentType.equals(FRAGMENT_TYPE_FLIP)) {
+                    mReverseAnimationSwitch.setVisible(false);
+                } else {
+                    mReverseAnimationSwitch.setVisible(!shouldAlternate);
+                }
+            }
 
             if (shouldAlternate) animationName = SettingsManager.getGlyphNotifsAnimation();
             if (animationName.startsWith(userAnimationPrefix)) {
@@ -476,14 +495,12 @@ public class AnimationSettingsFragment
         }
 
         if (preferenceKey.equals(Constants.GLYPH_FLIP_SUB_ANIMATION_ENABLE)) {
-            shouldAlternate = fragmentType.equals(FRAGMENT_TYPE_FLIP)
-                    && getGlyphAnimation().equals(Constants.GLYPH_NOTIF_ANIMATION_ALTERNATE);
-            boolean shouldReverse = mReverseAnimationSwitch.isChecked() && !shouldAlternate;
-
-            mGlyphAnimationPreference.updateAnimation((Boolean) newValue, 1500, shouldReverse);
+            shouldAlternate = false;
+            mGlyphAnimationPreference.updateAnimation((Boolean) newValue, 1500, false);
         }
 
-        if (preferenceKey.equals(Constants.GLYPH_NOTIFS_TONE_SYNC)) {
+        if (preferenceKey.equals(Constants.GLYPH_NOTIFS_TONE_SYNC)
+                || preferenceKey.equals(Constants.GLYPH_CALL_TONE_SYNC)) {
             if ((Boolean) newValue) {
                 mListPreference.setTitle(R.string.glyph_settings_sub_animations_title_sync_enabled);
             } else {
@@ -710,12 +727,7 @@ public class AnimationSettingsFragment
             }
 
             case FRAGMENT_TYPE_FLIP -> {
-                String value = SettingsManager.getGlyphFlipAnimation();
-                if (value.equals(Constants.GLYPH_NOTIF_ANIMATION_ALTERNATE)) {
-                    return SettingsManager.getGlyphNotifsAnimation();
-                } else {
-                    return value;
-                }
+                return "flip";
             }
         }
         return "";
@@ -869,9 +881,9 @@ public class AnimationSettingsFragment
                     resetLivePreview();
                     return;
                 }
-                shouldAlternate = fragmentType.equals(FRAGMENT_TYPE_FLIP)
-                        && mListPreference.getValue().equals(Constants.GLYPH_NOTIF_ANIMATION_ALTERNATE);
-                boolean shouldReverse = mReverseAnimationSwitch.isChecked() && !shouldAlternate;
+                shouldAlternate = false;
+                boolean shouldReverse = !fragmentType.equals(FRAGMENT_TYPE_FLIP)
+                        && mReverseAnimationSwitch != null && mReverseAnimationSwitch.isChecked();
                 AnimationManager.playCsv(
                         requireContext(),
                         getGlyphAnimation(),

@@ -108,7 +108,7 @@ public final class SettingsManager {
 
     public static int getGlyphBrightnessSetting() {
         Context ctx = getContext();
-        int d = 3; if (FileUtils.readLine("/mnt/vendor/persist/color") == "white") d = 2;
+        int d = 3; if ("white".equals(FileUtils.readLine("/mnt/vendor/persist/color"))) d = 2;
         return PreferenceManager.getDefaultSharedPreferences(ctx)
                 .getInt(Constants.GLYPH_BRIGHTNESS, d);
     }
@@ -212,11 +212,11 @@ public final class SettingsManager {
                         ResourceUtils.getString("glyph_settings_call_animations_default"));
     }
 
-//    public static boolean isGlyphRingtoneSyncEnabled() {
-//        Context ctx = getContext();
-//        return PreferenceManager.getDefaultSharedPreferences(ctx)
-//                .getBoolean(Constants.GLYPH_CALL_TONE_SYNC, false);
-//    }
+    public static boolean isGlyphRingtoneSyncEnabled() {
+        Context ctx = getContext();
+        return PreferenceManager.getDefaultSharedPreferences(ctx)
+                .getBoolean(Constants.GLYPH_CALL_TONE_SYNC, true);
+    }
 
     public static boolean isGlyphNotifsSyncEnabled() {
         Context ctx = getContext();
@@ -225,19 +225,11 @@ public final class SettingsManager {
     }
 
     public static String getGlyphFlipAnimation() {
-        Context ctx = getContext();
-        String defaultValue = ResourceUtils.hasFlipCsv() ? "flip" : Constants.GLYPH_NOTIF_ANIMATION_ALTERNATE;
-
-        return PreferenceManager.getDefaultSharedPreferences(ctx)
-                .getString(Constants.GLYPH_FLIP_SUB_ANIMATIONS,
-                        defaultValue);
+        return "flip";
     }
 
     public static boolean isGlyphFlipAnimationReversed() {
-        Context ctx = getContext();
-        return PreferenceManager.getDefaultSharedPreferences(ctx)
-                .getBoolean(Constants.GLYPH_FLIP_REVERSE_ANIMATION_ENABLE,
-                        false);
+        return false;
     }
 
     public static boolean isGlyphCallAnimationReversed() {

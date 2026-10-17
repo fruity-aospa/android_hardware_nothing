@@ -35,6 +35,9 @@ import co.aospa.glyph.Manager.SettingsManager;
 import co.aospa.glyph.Constants.Constants;
 import co.aospa.glyph.Utils.ResourceUtils;
 
+import co.aospa.glyph.Manager.StatusManager;
+import co.aospa.glyph.Utils.AnimationUtils;
+
 public class CallReceiverService extends InCallService {
 
     private static final String TAG = "GlyphCallReceiverService";
@@ -64,6 +67,12 @@ public class CallReceiverService extends InCallService {
                             SettingsManager.isGlyphCallAnimationReversed(callingPkg)
                     );
                 }
+            } else if (SettingsManager.isGlyphRingtoneSyncEnabled()
+                    && AnimationUtils.Holder.Call.isAvailable()) {
+                AnimationManager.playCallSynced(
+                        AnimationUtils.Holder.Call.getFrames(),
+                        SettingsManager.isGlyphCallAnimationReversed()
+                );
             } else {
                 AnimationManager.playCall(
                         SettingsManager.getGlyphCallAnimation(),
@@ -77,10 +86,8 @@ public class CallReceiverService extends InCallService {
     public void onCallAdded(Call call) {
         super.onCallAdded(call);
 
-        if (call.getDetails().getState() == Call.STATE_RINGING) {
-            tryContactId(call.getDetails());
-            getCallingPkg(call);
-            enableCallAnimation();
+        if (call.getDetails() != null && call.getDetails().getState() == Call.STATE_RINGING) {
+            handleRingingCall(call);
         }
 
         call.registerCallback(new Call.Callback() {
@@ -88,9 +95,7 @@ public class CallReceiverService extends InCallService {
             public void onStateChanged(Call call, int state) {
                 switch (state) {
                     case Call.STATE_RINGING:
-                        tryContactId(call.getDetails());
-                        getCallingPkg(call);
-                        enableCallAnimation();
+                        handleRingingCall(call);
                         break;
                     case Call.STATE_ACTIVE, Call.STATE_DISCONNECTED:
                         disableCallAnimation();
@@ -100,10 +105,27 @@ public class CallReceiverService extends InCallService {
         });
     }
 
+    private void handleRingingCall(Call call) {
+        if (StatusManager.isCallLedEnabled()) return;
+        getCallingPkg(call);
+        final Call.Details details = call.getDetails();
+        AnimationManager.submit(() -> {
+            if (StatusManager.isCallLedEnabled()) return;
+            if (details != null) {
+                tryContactId(details);
+            }
+            playCall.run();
+        });
+    }
+
     @Override
     public void onCreate() {
 
         if (DEBUG) Log.d(TAG, "Creating service");
+
+        if (Constants.CONTEXT == null) {
+            Constants.CONTEXT = getApplicationContext();
+        }
 
         thread = new HandlerThread("CallReceiverService");
         thread.start();
@@ -145,8 +167,9 @@ public class CallReceiverService extends InCallService {
     }
 
     private void getCallingPkg(Call call) {
+        if (call.getDetails() == null) return;
         PhoneAccountHandle handle = call.getDetails().getAccountHandle();
-        if (handle != null) {
+        if (handle != null && handle.getComponentName() != null) {
             callingPkg = handle.getComponentName().getPackageName();
             Log.d("TAG", "Call from package: " + callingPkg);
         }
@@ -174,15 +197,11 @@ public class CallReceiverService extends InCallService {
 
     }
 
-    private void enableCallAnimation() {
-        if (DEBUG) Log.d(TAG, "enableCallAnimation");
-        mThreadHandler.post(playCall);
-    }
-
     private void disableCallAnimation() {
         if (DEBUG) Log.d(TAG, "disableCallAnimation");
-        if (mThreadHandler.hasCallbacks(playCall))
-            mThreadHandler.removeCallbacks(playCall);
+        mThreadHandler.removeCallbacksAndMessages(null);
+        contactId = 0;
+        callingPkg = null;
         AnimationManager.stopCall();
     }
 

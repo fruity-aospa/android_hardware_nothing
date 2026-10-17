@@ -49,12 +49,12 @@ class IGlyphServiceImpl(private val context: Context) : IGlyphService.Stub() {
 
     override fun openSession() {
         Log.i("IGlyphServiceImpl", "openSession")
-        glyphService?.setFrameColors(intArrayOf(0, 0, 0, 0, 0))
+        glyphService?.openSession()
     }
 
     override fun closeSession() {
         Log.i("IGlyphServiceImpl", "closeSession")
-        glyphService?.setFrameColors(intArrayOf(0, 0, 0, 0, 0))
+        glyphService?.closeSession()
     }
 
 
