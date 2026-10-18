@@ -1,1 +1,11 @@
 extra_system_uid_app_domain(glyph_app)
+
+# Allow Glyph app to use MediaExtractor and MediaCodec for audio animation generation
+allow glyph_app {
+    mediaextractor_service
+    mediametrics_service
+    mediaserver_service
+}:service_manager find;
+
+binder_call(glyph_app, mediaextractor)
+binder_call(glyph_app, mediaserver)
