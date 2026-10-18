@@ -108,8 +108,6 @@ public class AnimationSettingsFragment
 
     private ListPreference mListPreference;
     private Preference mLivePreviewPreference;
-    private Preference mCurrentPreviewPreference;
-    private String currentPreviewKey;
     private MediaPlayer mMediaPlayer;
     private boolean mIsPreviewPlaying = false;
     private MultiSelectListPreference mMultiSelectListPreference;
@@ -149,6 +147,9 @@ public class AnimationSettingsFragment
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        if (Constants.CONTEXT == null && getContext() != null) {
+            Constants.CONTEXT = getContext().getApplicationContext();
+        }
 
         Bundle args = getArguments();
         fragmentType = args.getString("type", "").toUpperCase();
@@ -249,9 +250,6 @@ public class AnimationSettingsFragment
         }
 
         mLivePreviewPreference = findPreference(livePreviewKey);
-        if (currentPreviewKey != null) {
-            mCurrentPreviewPreference = findPreference(currentPreviewKey);
-        }
         mGlyphAnimationPreference = findPreference(animationPreviewKey);
         if (mGlyphAnimationPreference != null) {
             mGlyphAnimationPreference.setSelectable(true);
@@ -291,7 +289,6 @@ public class AnimationSettingsFragment
                 enableKey = Constants.GLYPH_NOTIFS_SUB_ENABLE;
 
                 livePreviewKey = Constants.GLYPH_NOTIFS_SUB_LIVE_PREVIEW;
-                currentPreviewKey = Constants.GLYPH_NOTIFS_CURRENT_PREVIEW;
 
                 userAnimationPrefix = Constants.GLYPH_USER_NOTIF_CSV_PREFIX;
                 animationListKey = Constants.GLYPH_NOTIFS_SUB_ANIMATIONS;
@@ -391,7 +388,6 @@ public class AnimationSettingsFragment
                 animationListKey = Constants.GLYPH_CALL_SUB_ANIMATIONS;
                 defaultAnimation = "glyph_settings_call_animations_default";
                 livePreviewKey = Constants.GLYPH_CALL_SUB_LIVE_PREVIEW;
-                currentPreviewKey = Constants.GLYPH_CALL_CURRENT_PREVIEW;
                 reverseAnimationKey = Constants.GLYPH_CALL_REVERSE_ANIMATION_ENABLE;
 
             }
@@ -404,7 +400,6 @@ public class AnimationSettingsFragment
                 animationListKey = Constants.GLYPH_FLIP_SUB_ANIMATIONS;
                 enableKey = Constants.GLYPH_FLIP_SUB_ENABLE;
                 livePreviewKey = Constants.GLYPH_FLIP_SUB_LIVE_PREVIEW;
-                currentPreviewKey = null;
                 reverseAnimationKey = Constants.GLYPH_FLIP_REVERSE_ANIMATION_ENABLE;
 
                 mGlyphFlipAnimationSwitch = findPreference(Constants.GLYPH_FLIP_SUB_ANIMATION_ENABLE);
@@ -857,13 +852,7 @@ public class AnimationSettingsFragment
     public boolean onPreferenceTreeClick(Preference preference) {
         String key = preference.getKey();
         if (key != null) {
-            if (key.equals(currentPreviewKey)) {
-                toggleLivePreview(true);
-                return true;
-            } else if (key.equals(livePreviewKey)) {
-                toggleLivePreview(false);
-                return true;
-            } else if (key.equals(animationPreviewKey)) {
+            if (key.equals(livePreviewKey) || key.equals(animationPreviewKey)) {
                 boolean toneSyncEnabled = (fragmentType.equals(FRAGMENT_TYPE_CALL) && SettingsManager.isGlyphRingtoneSyncEnabled())
                         || (fragmentType.equals(FRAGMENT_TYPE_NOTIF) && SettingsManager.isGlyphNotifsSyncEnabled());
                 toggleLivePreview(toneSyncEnabled);
@@ -895,9 +884,6 @@ public class AnimationSettingsFragment
     }
 
     private void updateToneSyncState(boolean isChecked) {
-        if (mCurrentPreviewPreference != null) {
-            mCurrentPreviewPreference.setVisible(isChecked);
-        }
         if (mListPreference != null) {
             if (isChecked) {
                 mListPreference.setTitle(R.string.glyph_settings_sub_animations_title_sync_enabled);
@@ -905,6 +891,7 @@ public class AnimationSettingsFragment
                 mListPreference.setTitle(R.string.glyph_settings_sub_animations_title);
             }
         }
+        resetLivePreview();
         updatePreviewAnimation();
     }
 
@@ -1020,9 +1007,6 @@ public class AnimationSettingsFragment
         if (context == null) return;
         mIsPreviewPlaying = true;
 
-        if (mCurrentPreviewPreference != null && playCurrentSynced) {
-            mCurrentPreviewPreference.setSummary(R.string.glyph_settings_animations_live_preview_summary_playing_tap_to_stop);
-        }
         if (mLivePreviewPreference != null) {
             mLivePreviewPreference.setSummary(R.string.glyph_settings_animations_live_preview_summary_playing_tap_to_stop);
         }
@@ -1039,9 +1023,20 @@ public class AnimationSettingsFragment
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                         .build());
                 mMediaPlayer.setOnCompletionListener(mp -> stopLivePreview());
+                mMediaPlayer.setOnErrorListener((mp, what, extra) -> {
+                    Log.w(TAG, "MediaPlayer error during preview: what=" + what + ", extra=" + extra);
+                    return true;
+                });
+                mMediaPlayer.prepare();
                 mMediaPlayer.start();
             } catch (Exception e) {
                 Log.w(TAG, "Failed to start media player for preview", e);
+                if (mMediaPlayer != null) {
+                    try {
+                        mMediaPlayer.release();
+                    } catch (Exception ignored) {}
+                    mMediaPlayer = null;
+                }
             }
         }
 
@@ -1088,10 +1083,12 @@ public class AnimationSettingsFragment
         livePreviewThread.start();
     }
 
-    private void stopLivePreview() {
+    private synchronized void stopLivePreview() {
         mIsPreviewPlaying = false;
         if (mMediaPlayer != null) {
             try {
+                mMediaPlayer.setOnCompletionListener(null);
+                mMediaPlayer.setOnErrorListener(null);
                 if (mMediaPlayer.isPlaying()) {
                     mMediaPlayer.stop();
                 }
@@ -1150,15 +1147,19 @@ public class AnimationSettingsFragment
         mIsPreviewPlaying = false;
         if (mLivePreviewPreference != null) {
             mLivePreviewPreference.setEnabled(true);
-            mLivePreviewPreference.setSummary(
-                    R.string.glyph_settings_animations_live_preview_summary
-            );
-        }
-        if (mCurrentPreviewPreference != null) {
-            mCurrentPreviewPreference.setEnabled(true);
-            mCurrentPreviewPreference.setSummary(fragmentType != null && fragmentType.equals(FRAGMENT_TYPE_CALL)
-                    ? R.string.glyph_settings_current_glyph_preview_summary
-                    : R.string.glyph_settings_current_glyph_preview_summary_notif);
+            boolean isCall = fragmentType != null && fragmentType.equals(FRAGMENT_TYPE_CALL);
+            boolean isNotif = fragmentType != null && fragmentType.equals(FRAGMENT_TYPE_NOTIF);
+            boolean toneSyncEnabled = (isCall && SettingsManager.isGlyphRingtoneSyncEnabled())
+                    || (isNotif && SettingsManager.isGlyphNotifsSyncEnabled());
+            if (toneSyncEnabled && !isAppSpecific && !isContactSpecific) {
+                mLivePreviewPreference.setSummary(isCall
+                        ? R.string.glyph_settings_current_glyph_preview_summary
+                        : R.string.glyph_settings_current_glyph_preview_summary_notif);
+            } else {
+                mLivePreviewPreference.setSummary(
+                        R.string.glyph_settings_animations_live_preview_summary
+                );
+            }
         }
     }
 

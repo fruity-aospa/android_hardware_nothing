@@ -33,12 +33,6 @@
         android:defaultValue="true"
         android:summary="@string/glyph_settings_notifs_ogg_sync_toggle_summary" />
 
-    <Preference
-        android:key="glyph_settings_notifs_current_preview"
-        android:icon="@drawable/ic_live"
-        android:title="@string/glyph_settings_current_glyph_preview_title"
-        android:summary="@string/glyph_settings_current_glyph_preview_summary_notif" />
-
     <PreferenceCategory>
 
             <ListPreference

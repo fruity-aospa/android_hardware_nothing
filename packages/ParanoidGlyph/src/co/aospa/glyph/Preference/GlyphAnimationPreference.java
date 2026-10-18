@@ -103,6 +103,9 @@ public class GlyphAnimationPreference extends Preference {
     @Override
     public void onBindViewHolder(PreferenceViewHolder holder) {
         holder.itemView.setOnClickListener(mClickListener);
+        if (mRootView != null) {
+            mRootView.setOnClickListener(mClickListener);
+        }
 
         final boolean selectable = isSelectable();
         holder.itemView.setFocusable(isSelectable());
@@ -264,11 +267,11 @@ public class GlyphAnimationPreference extends Preference {
                             });
                         } else if (Constants.Device.isPhone3a() && split.length >= 36) { // Phone (3a) / (3a) Pro pattern on Phone (3a) / (3a) Pro
                             int zone0 = 0;
-                            for (int i = 0; i <= 19; i++) {
+                            for (int i = 0; i <= 10; i++) {
                                 try { zone0 = Math.max(zone0, Integer.parseInt(split[i].trim())); } catch (Exception ignored) {}
                             }
                             int zone1 = 0;
-                            for (int i = 20; i <= 30; i++) {
+                            for (int i = 11; i <= 30; i++) {
                                 try { zone1 = Math.max(zone1, Integer.parseInt(split[i].trim())); } catch (Exception ignored) {}
                             }
                             int zone2 = 0;
