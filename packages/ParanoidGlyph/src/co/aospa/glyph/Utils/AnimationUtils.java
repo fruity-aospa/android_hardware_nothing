@@ -2,6 +2,7 @@ package co.aospa.glyph.Utils;
 
 import static co.aospa.glyph.Utils.InterfaceUtils.showToast;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -124,7 +125,7 @@ public class AnimationUtils {
         validateFrameBrightness(frame, true);
     }
 
-    public static boolean isAnimationComplex(String csv) throws IOException {
+    public static boolean isAnimationComplex(String csv) {
         try (BufferedReader reader = new BufferedReader(new StringReader(csv))) {
             Iterator<String> it = iterateCsvLines(reader, false);
             String line;
@@ -396,6 +397,10 @@ public class AnimationUtils {
             }
         }
 
+        public static Context getContext() {
+            return Constants.CONTEXT;
+        }
+
         public static class Call {
             private static String csv;
             private static int[][] frames;
@@ -409,9 +414,10 @@ public class AnimationUtils {
                 csv = c;
                 if (c != null && !c.isEmpty()) {
                     frames = parseCsvToFrames(c);
-                    if (persist && Constants.CONTEXT != null) {
+                    Context ctx = getContext();
+                    if (persist && ctx != null) {
                         try {
-                            java.io.File file = new java.io.File(Constants.CONTEXT.getFilesDir(), CACHE_FILE_NAME);
+                            java.io.File file = new java.io.File(ctx.getFilesDir(), CACHE_FILE_NAME);
                             java.nio.file.Files.writeString(file.toPath(), c, StandardCharsets.UTF_8);
                         } catch (Exception ignored) {}
                     }
@@ -429,9 +435,10 @@ public class AnimationUtils {
             }
 
             private static void loadFromCache() {
-                if (Constants.CONTEXT == null) return;
+                Context ctx = getContext();
+                if (ctx == null) return;
                 try {
-                    java.io.File file = new java.io.File(Constants.CONTEXT.getFilesDir(), CACHE_FILE_NAME);
+                    java.io.File file = new java.io.File(ctx.getFilesDir(), CACHE_FILE_NAME);
                     if (file.exists() && file.length() > 0) {
                         String cached = java.nio.file.Files.readString(file.toPath(), StandardCharsets.UTF_8);
                         if (cached != null && !cached.isEmpty()) {
@@ -459,9 +466,10 @@ public class AnimationUtils {
             public static void clear() {
                 csv = null;
                 frames = null;
-                if (Constants.CONTEXT != null) {
+                Context ctx = getContext();
+                if (ctx != null) {
                     try {
-                        java.io.File file = new java.io.File(Constants.CONTEXT.getFilesDir(), CACHE_FILE_NAME);
+                        java.io.File file = new java.io.File(ctx.getFilesDir(), CACHE_FILE_NAME);
                         if (file.exists()) file.delete();
                     } catch (Exception ignored) {}
                 }
@@ -481,9 +489,10 @@ public class AnimationUtils {
                 csv = c;
                 if (c != null && !c.isEmpty()) {
                     frames = parseCsvToFrames(c);
-                    if (persist && Constants.CONTEXT != null) {
+                    Context ctx = getContext();
+                    if (persist && ctx != null) {
                         try {
-                            java.io.File file = new java.io.File(Constants.CONTEXT.getFilesDir(), CACHE_FILE_NAME);
+                            java.io.File file = new java.io.File(ctx.getFilesDir(), CACHE_FILE_NAME);
                             java.nio.file.Files.writeString(file.toPath(), c, StandardCharsets.UTF_8);
                         } catch (Exception ignored) {}
                     }
@@ -501,9 +510,10 @@ public class AnimationUtils {
             }
 
             private static void loadFromCache() {
-                if (Constants.CONTEXT == null) return;
+                Context ctx = getContext();
+                if (ctx == null) return;
                 try {
-                    java.io.File file = new java.io.File(Constants.CONTEXT.getFilesDir(), CACHE_FILE_NAME);
+                    java.io.File file = new java.io.File(ctx.getFilesDir(), CACHE_FILE_NAME);
                     if (file.exists() && file.length() > 0) {
                         String cached = java.nio.file.Files.readString(file.toPath(), StandardCharsets.UTF_8);
                         if (cached != null && !cached.isEmpty()) {
@@ -531,9 +541,10 @@ public class AnimationUtils {
             public static void clear() {
                 csv = null;
                 frames = null;
-                if (Constants.CONTEXT != null) {
+                Context ctx = getContext();
+                if (ctx != null) {
                     try {
-                        java.io.File file = new java.io.File(Constants.CONTEXT.getFilesDir(), CACHE_FILE_NAME);
+                        java.io.File file = new java.io.File(ctx.getFilesDir(), CACHE_FILE_NAME);
                         if (file.exists()) file.delete();
                     } catch (Exception ignored) {}
                 }

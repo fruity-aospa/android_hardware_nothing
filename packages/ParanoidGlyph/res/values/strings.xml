@@ -55,7 +55,12 @@
 
     <string name="glyph_settings_animations_live_preview_summary_playing">Now Playing...</string>
     <string name="glyph_settings_animations_live_preview_title">Live Preview</string>
-    <string name="glyph_settings_animations_live_preview_summary">Preview selected animation on Glyphs</string>
+    <string name="glyph_settings_animations_live_preview_summary">Preview selected animation on Glyphs with sound</string>
+    <string name="glyph_settings_current_glyph_preview_title">Current Glyph animation</string>
+    <string name="glyph_settings_current_glyph_preview_summary">Preview current synced ringtone animation with sound</string>
+    <string name="glyph_settings_current_glyph_preview_summary_notif">Preview current synced notification animation with sound</string>
+    <string name="glyph_settings_animations_live_preview_summary_sync">Preview current synced animation on Glyphs with sound</string>
+    <string name="glyph_settings_animations_live_preview_summary_playing_tap_to_stop">Playing preview with sound... (tap to stop)</string>
 
     <string name="glyph_settings_flip_title">Flip to Glyph</string>
 
