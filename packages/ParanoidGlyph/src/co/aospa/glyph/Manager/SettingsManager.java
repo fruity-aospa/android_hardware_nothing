@@ -108,7 +108,10 @@ public final class SettingsManager {
 
     public static int getGlyphBrightnessSetting() {
         Context ctx = getContext();
-        int d = 3; if ("white".equals(FileUtils.readLine("/mnt/vendor/persist/color"))) d = 2;
+        int d = 3;
+        if (Constants.Device.isPhone1() && "white".equals(FileUtils.readLine("/mnt/vendor/persist/color"))) {
+            d = 2;
+        }
         return PreferenceManager.getDefaultSharedPreferences(ctx)
                 .getInt(Constants.GLYPH_BRIGHTNESS, d);
     }

@@ -252,7 +252,7 @@
     <!-- Auto Generator -->
     <string name="glyph_settings_utilities_generator_title">Generator</string>
     <string name="glyph_utilities_auto_generate_title">Auto Generator</string>
-    <string name="glyph_utilities_auto_generate_summary">Generate 36-column synced Glyph animations from any audio</string>
+    <string name="glyph_utilities_auto_generate_summary">Generate Glyph animations from any audio</string>
     <string name="glyph_generator_dialog_title">Glyph Auto Generator</string>
     <string name="glyph_generator_mode_beats">Beats (Heavy rhythm sweep)</string>
     <string name="glyph_generator_mode_smooth">Smooth (Anti-flicker reactive)</string>

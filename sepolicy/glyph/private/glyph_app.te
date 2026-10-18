@@ -5,6 +5,7 @@ allow glyph_app {
     mediaextractor_service
     mediametrics_service
     mediaserver_service
+    virtual_device_native_service
 }:service_manager find;
 
 binder_call(glyph_app, mediaextractor)
