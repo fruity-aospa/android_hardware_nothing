@@ -122,6 +122,8 @@ public class ToneHelperService extends Service {
     }
 
     private void handleSettingChange(String key, String value, boolean shouldNotify) {
+        saveRing = SettingsManager.isGlyphRingtoneSyncEnabled();
+        saveNotif = SettingsManager.isGlyphNotifsSyncEnabled();
         boolean isOgg = false;
         try {
             Uri uri = Uri.parse(value);
@@ -266,8 +268,11 @@ public class ToneHelperService extends Service {
     private void tryAnimationData(String key, String value, boolean shouldNotify) {
         OGGParser parser = null;
         Uri soundUri = Uri.parse(value);
-        try {
-            InputStream inputStream = resolver.openInputStream(soundUri);
+        try (InputStream inputStream = resolver.openInputStream(soundUri)) {
+            if (inputStream == null) {
+                clearHolder(key);
+                return;
+            }
             parser = new OGGParser(inputStream);
         } catch (FileNotFoundException e) {
             Log.w(TAG, "Audio file not found: " + value);
