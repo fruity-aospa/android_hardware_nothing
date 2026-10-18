@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
@@ -449,10 +450,54 @@ public final class AudioGlyphGenerator {
      * to a normalized float array [-1.0, 1.0] representing mono PCM audio samples.
      */
     public static float[] decodeToPcm(Context context, Uri uri, int[] outSampleRate) throws IOException {
+        android.content.res.AssetFileDescriptor afd = null;
+        try {
+            afd = context.getContentResolver().openAssetFileDescriptor(uri, "r");
+            if (afd != null) {
+                MediaExtractor extractor = new MediaExtractor();
+                if (afd.getDeclaredLength() < 0) {
+                    extractor.setDataSource(afd.getFileDescriptor());
+                } else {
+                    extractor.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getDeclaredLength());
+                }
+                return decodeWithExtractor(extractor, outSampleRate);
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "Direct AssetFileDescriptor extraction failed for " + uri + ": " + e.getMessage());
+        } finally {
+            if (afd != null) {
+                try {
+                    afd.close();
+                } catch (Exception ignored) {}
+            }
+        }
+
+        // Robust fallback: copy stream to temporary cache file
+        try (InputStream is = context.getContentResolver().openInputStream(uri)) {
+            if (is != null) {
+                File tempFile = File.createTempFile("glyph_audio_", ".tmp", context.getCacheDir());
+                try {
+                    try (java.io.FileOutputStream fos = new java.io.FileOutputStream(tempFile)) {
+                        byte[] buf = new byte[8192];
+                        int r;
+                        while ((r = is.read(buf)) != -1) {
+                            fos.write(buf, 0, r);
+                        }
+                    }
+                    return decodeToPcm(tempFile, outSampleRate);
+                } finally {
+                    tempFile.delete();
+                }
+            }
+        } catch (Exception ex) {
+            Log.w(TAG, "Fallback to temp file failed: " + ex.getMessage());
+        }
+
         MediaExtractor extractor = new MediaExtractor();
         extractor.setDataSource(context, uri, null);
         return decodeWithExtractor(extractor, outSampleRate);
     }
+
 
     public static float[] decodeToPcm(File file, int[] outSampleRate) throws IOException {
         MediaExtractor extractor = new MediaExtractor();

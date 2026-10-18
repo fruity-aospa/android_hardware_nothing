@@ -9,11 +9,14 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -133,11 +136,7 @@ public class UtilitiesFragment extends SettingsBasePreferenceFragment {
                 mFilePicker.launch(oggMime);
             }
             case Constants.GLYPH_UTILITIES_AUTO_GENERATE -> {
-                mFilePickerAction = uri -> {
-                    mSelectedAudioUri = uri;
-                    showModeSelectionDialog(uri);
-                };
-                mFilePicker.launch(audioMime);
+                showSourceSelectionDialog();
             }
         }
         return true;
@@ -151,8 +150,105 @@ public class UtilitiesFragment extends SettingsBasePreferenceFragment {
         }
     );
 
+    private void showSourceSelectionDialog() {
+        android.content.Context context = requireContext();
+        Uri ringtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
+        if (ringtoneUri == null) {
+            String ringtoneSetting = Settings.System.getString(context.getContentResolver(), Settings.System.RINGTONE);
+            if (ringtoneSetting != null) {
+                ringtoneUri = Uri.parse(ringtoneSetting);
+            }
+        }
+
+        Uri notifUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
+        if (notifUri == null) {
+            String notifSetting = Settings.System.getString(context.getContentResolver(), Settings.System.NOTIFICATION_SOUND);
+            if (notifSetting != null) {
+                notifUri = Uri.parse(notifSetting);
+            }
+        }
+
+        String ringtoneTitle = getAudioTitle(ringtoneUri, getString(R.string.glyph_generator_source_default_ringtone));
+        String notifTitle = getAudioTitle(notifUri, getString(R.string.glyph_generator_source_default_notif));
+
+        String[] sources = new String[] {
+            String.format(getString(R.string.glyph_generator_source_ringtone), ringtoneTitle),
+            String.format(getString(R.string.glyph_generator_source_notif), notifTitle),
+            getString(R.string.glyph_generator_source_file)
+        };
+
+        final Uri finalRingtoneUri = ringtoneUri;
+        final String finalRingtoneTitle = ringtoneTitle;
+        final Uri finalNotifUri = notifUri;
+        final String finalNotifTitle = notifTitle;
+
+        new AlertDialog.Builder(requireActivity())
+                .setTitle(R.string.glyph_generator_source_title)
+                .setItems(sources, (dialog, which) -> {
+                    switch (which) {
+                        case 0 -> { // Current Ringtone
+                            if (finalRingtoneUri != null) {
+                                mSelectedAudioUri = finalRingtoneUri;
+                                showModeSelectionDialog(finalRingtoneUri, finalRingtoneTitle);
+                            } else {
+                                showToast(getString(R.string.glyph_generator_no_ringtone));
+                            }
+                        }
+                        case 1 -> { // Current Notification
+                            if (finalNotifUri != null) {
+                                mSelectedAudioUri = finalNotifUri;
+                                showModeSelectionDialog(finalNotifUri, finalNotifTitle);
+                            } else {
+                                showToast(getString(R.string.glyph_generator_no_notif));
+                            }
+                        }
+                        case 2 -> { // Choose Audio File
+                            mFilePickerAction = uri -> {
+                                mSelectedAudioUri = uri;
+                                showModeSelectionDialog(uri, null);
+                            };
+                            mFilePicker.launch(audioMime);
+                        }
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private String getAudioTitle(Uri uri, String fallback) {
+        if (uri == null) return fallback;
+        try {
+            Ringtone r = RingtoneManager.getRingtone(requireContext(), uri);
+            if (r != null) {
+                String title = r.getTitle(requireContext());
+                if (title != null && !title.isEmpty()) {
+                    return title;
+                }
+            }
+        } catch (Exception ignored) {}
+        try {
+            String titleParam = uri.getQueryParameter("title");
+            if (titleParam != null && !titleParam.isEmpty()) {
+                return titleParam;
+            }
+        } catch (Exception ignored) {}
+        try {
+            String fileName = getFileName(requireContext(), uri);
+            if (fileName != null && !fileName.isEmpty() && !"audio".equals(fileName)) {
+                return fileName;
+            }
+        } catch (Exception ignored) {}
+        return fallback;
+    }
+
     private void showModeSelectionDialog(Uri audioUri) {
-        String fileName = getFileName(requireContext(), audioUri);
+        showModeSelectionDialog(audioUri, null);
+    }
+
+    private void showModeSelectionDialog(Uri audioUri, String customDisplayName) {
+        String fileName = (customDisplayName != null && !customDisplayName.isEmpty())
+                ? customDisplayName
+                : getFileName(requireContext(), audioUri);
         String[] modes = new String[] {
             getString(R.string.glyph_generator_mode_beats),
             getString(R.string.glyph_generator_mode_smooth),

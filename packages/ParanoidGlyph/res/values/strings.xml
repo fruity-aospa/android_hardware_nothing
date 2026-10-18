@@ -244,9 +244,9 @@
     <string name="file_export_complete_message">File saved successfully!</string>
     <string name="file_already_exported_summary">File already saved</string>
 
-    <!-- Auto Generator (Phone 3a) -->
+    <!-- Auto Generator -->
     <string name="glyph_settings_utilities_generator_title">Generator</string>
-    <string name="glyph_utilities_auto_generate_title">Auto Generator (Phone 3a)</string>
+    <string name="glyph_utilities_auto_generate_title">Auto Generator</string>
     <string name="glyph_utilities_auto_generate_summary">Generate 36-column synced Glyph animations from any audio</string>
     <string name="glyph_generator_dialog_title">Glyph Auto Generator</string>
     <string name="glyph_generator_mode_beats">Beats (Heavy rhythm sweep)</string>
@@ -262,5 +262,13 @@
     <string name="glyph_generator_success">Generated %1$d frames (%2$ds)</string>
     <string name="glyph_generator_applied_call">Set as active Call Glyph animation!</string>
     <string name="glyph_generator_applied_notif">Set as active Notification Glyph animation!</string>
+    <string name="glyph_generator_source_title">Select Audio Source</string>
+    <string name="glyph_generator_source_ringtone">Current Ringtone (%s)</string>
+    <string name="glyph_generator_source_notif">Current Notification (%s)</string>
+    <string name="glyph_generator_source_file">Choose Audio File…</string>
+    <string name="glyph_generator_source_default_ringtone">Ringtone</string>
+    <string name="glyph_generator_source_default_notif">Notification</string>
+    <string name="glyph_generator_no_ringtone">No ringtone set</string>
+    <string name="glyph_generator_no_notif">No notification sound set</string>
 
 </resources>

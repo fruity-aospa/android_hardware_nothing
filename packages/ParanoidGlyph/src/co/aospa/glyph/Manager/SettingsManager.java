@@ -221,7 +221,7 @@ public final class SettingsManager {
     public static boolean isGlyphNotifsSyncEnabled() {
         Context ctx = getContext();
         return PreferenceManager.getDefaultSharedPreferences(ctx)
-                .getBoolean(Constants.GLYPH_NOTIFS_TONE_SYNC, false);
+                .getBoolean(Constants.GLYPH_NOTIFS_TONE_SYNC, true);
     }
 
     public static String getGlyphFlipAnimation() {

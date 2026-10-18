@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import co.aospa.glyph.Constants.Constants;
+import co.aospa.glyph.Manager.AnimationManager;
 import co.aospa.glyph.Manager.SettingsManager;
 import co.aospa.glyph.Utils.AnimationUtils;
 import co.aospa.glyph.Utils.AudioGlyphGenerator;
@@ -245,6 +246,18 @@ public class ToneHelperService extends Service {
             return;
         }
 
+        String lastUriKey = isRing ? "glyph_last_gen_ring_uri" : "glyph_last_gen_notif_uri";
+        String lastUri = PreferenceManager.getDefaultSharedPreferences(this).getString(lastUriKey, null);
+        if (soundUri.toString().equals(lastUri)) {
+            if (isRing && AnimationUtils.Holder.Call.isAvailable()) {
+                Log.d(TAG, "Phone (3a) auto-generated call animation already cached for " + value);
+                return;
+            } else if (!isRing && AnimationUtils.Holder.Notification.isAvailable()) {
+                Log.d(TAG, "Phone (3a) auto-generated notif animation already cached for " + value);
+                return;
+            }
+        }
+
         Log.d(TAG, "Attempting Phone (3a) auto-generation for " + key + ": " + value);
         try {
             int mode = isRing ? AudioGlyphGenerator.MODE_SMOOTH : AudioGlyphGenerator.MODE_BEATS;
@@ -252,9 +265,12 @@ public class ToneHelperService extends Service {
             if (generatedCsv != null && !generatedCsv.isEmpty()) {
                 if (isRing) {
                     AnimationUtils.Holder.Call.setCsv(generatedCsv, true);
+                    AnimationManager.clearCallAnimationCache();
                 } else {
                     AnimationUtils.Holder.Notification.setCsv(generatedCsv, true);
                 }
+                PreferenceManager.getDefaultSharedPreferences(this).edit().putString(lastUriKey, soundUri.toString()).apply();
+                if (shouldNotify) notifyUser(key, value);
                 Log.d(TAG, "Phone (3a) animation auto-generated & saved successfully for " + key);
                 return;
             }
