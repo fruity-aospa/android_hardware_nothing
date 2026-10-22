@@ -55,6 +55,9 @@ public class PowershareService extends Service {
             stopSelf();
             return START_NOT_STICKY;
         } else {
+            if (mFileObserver == null) {
+                mFileObserver = new GlyphFileObserver(POWERSHARE_ENABLED);
+            }
             mFileObserver.startWatching();
             mPowershareActiveObserver.startWatching();
         }
@@ -75,7 +78,9 @@ public class PowershareService extends Service {
     @Override
     public void onDestroy() {
         if (DEBUG) Log.d(TAG, "Destroying service");
-        mFileObserver.stopWatching();
+        if (mFileObserver != null) {
+            mFileObserver.stopWatching();
+        }
         mPowershareActiveObserver.stopWatching();
         super.onDestroy();
     }
@@ -95,16 +100,29 @@ public class PowershareService extends Service {
         mPowershareActiveObserver.pauseWatching();
     }
 
-    private final FileObserver mFileObserver = new FileObserver(POWERSHARE_ENABLED, FileObserver.MODIFY) {
+    // Rebuilt in onStartCommand once the sysfs paths are resolved; a field
+    // initializer watched a null path here and could never fire events.
+    private FileObserver mFileObserver;
+
+    private class GlyphFileObserver extends FileObserver {
+
+        private boolean mWatchStarted = false;
+
+        GlyphFileObserver(String path) {
+            super(path, FileObserver.MODIFY);
+        }
+
         @Override
         public void onEvent(int event, String file) {
-            this.checkIfPowerShareIsEnabled();
+            checkIfPowerShareIsEnabled();
         }
 
         @Override
         public void startWatching() {
+            if (mWatchStarted) return;
+            mWatchStarted = true;
             if (DEBUG) Log.e(TAG, "FileObserver: startWatching");
-            this.checkIfPowerShareIsEnabled();
+            checkIfPowerShareIsEnabled();
             super.startWatching();
         }
 
@@ -117,15 +135,15 @@ public class PowershareService extends Service {
                 onPowershareDisabled();
             }
         }
-    };
+    }
 
     private class PowershareActiveObserver extends Thread {
 
-        private boolean lastState = false;
-        private boolean pause = true;
-        private boolean ended = false;
+        private volatile boolean lastState = false;
+        private volatile boolean pause = true;
+        private volatile boolean ended = false;
 
-        private Object mPowershareActiveObserverLock = new Object();
+        private final Object mPowershareActiveObserverLock = new Object();
 
         public void startWatching() {
             if (DEBUG) Log.e(TAG, "PowershareActiveObserver: startWatching");
@@ -151,8 +169,10 @@ public class PowershareService extends Service {
 
         public void stopWatching() {
             if (DEBUG) Log.e(TAG, "PowershareActiveObserver: stopWatching");
-            if (pause) this.continueWatching();
             ended = true;
+            synchronized (mPowershareActiveObserverLock) {
+                mPowershareActiveObserverLock.notify();
+            }
         }
 
         private void updatePowershareState() {
@@ -172,13 +192,14 @@ public class PowershareService extends Service {
             if (DEBUG) Log.e(TAG, "PowershareActiveObserver: run");
             while (!ended) {
                 synchronized (mPowershareActiveObserverLock) {
-                    if (pause) {
+                    while (pause && !ended) {
                         try {
                             if (DEBUG) Log.d(TAG, "mPowershareActiveObserverLock.wait()");
                             mPowershareActiveObserverLock.wait();
                         } catch (InterruptedException e) {}
                     }
                 }
+                if (ended) break;
                 updatePowershareState();
                 try {
                     Thread.sleep(500);
