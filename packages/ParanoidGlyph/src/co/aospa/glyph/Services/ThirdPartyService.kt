@@ -13,6 +13,7 @@ import com.nothing.thirdparty.IGlyphService
 class ThirdPartyService : Service() {
 
     private var wakeLock: PowerManager.WakeLock? = null
+    private val wakeLockLock = Any()
     private val binder = object : IGlyphService.Stub() {
         override fun setFrameColors(iArray: IntArray?) {
             Log.d("ThirdPartyService", "received data: ${iArray.contentToString()}")
@@ -46,30 +47,31 @@ class ThirdPartyService : Service() {
         override fun closeAppMatrix() {}
     }
 
-    override fun onCreate() {
-        super.onCreate()
-    }
-
     override fun onBind(intent: Intent?): IBinder {
         return binder
     }
 
     private fun acquireWakeLock() {
-        if (wakeLock == null) {
-            val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ThirdPartyService::WakeLock")
-            wakeLock?.acquire(60000)
-            Log.d("ThirdPartyService", "WakeLock acquired with safety timeout")
+        synchronized(wakeLockLock) {
+            if (wakeLock == null) {
+                val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+                wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ThirdPartyService::WakeLock")
+                wakeLock?.acquire(60000)
+                Log.d("ThirdPartyService", "WakeLock acquired with safety timeout")
+            }
         }
     }
 
     private fun releaseWakeLock() {
-        if (wakeLock != null) {
-            if (wakeLock?.isHeld == true) {
-                wakeLock?.release()
+        synchronized(wakeLockLock) {
+            val lock = wakeLock
+            if (lock != null) {
+                if (lock.isHeld) {
+                    lock.release()
+                }
+                wakeLock = null
+                Log.d("ThirdPartyService", "WakeLock released")
             }
-            wakeLock = null
-            Log.d("ThirdPartyService", "WakeLock released")
         }
     }
 }

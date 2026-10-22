@@ -13,6 +13,7 @@ import android.os.IBinder
 import android.util.Log
 
 class IGlyphServiceImpl(private val context: Context) : IGlyphService.Stub() {
+    @Volatile
     private var glyphService: IGlyphService? = null
 
     private val connection = object : ServiceConnection {
@@ -23,6 +24,14 @@ class IGlyphServiceImpl(private val context: Context) : IGlyphService.Stub() {
         override fun onServiceDisconnected(name: ComponentName?) {
             glyphService = null
         }
+
+        override fun onBindingDied(name: ComponentName?) {
+            glyphService = null
+        }
+
+        override fun onNullBinding(name: ComponentName?) {
+            glyphService = null
+        }
     }
 
     init {
@@ -30,13 +39,11 @@ class IGlyphServiceImpl(private val context: Context) : IGlyphService.Stub() {
     }
 
     private fun bindglyphService() {
-        if (context != null) {
-            val intent = Intent("com.nothing.thirdparty.IGlyphService").apply {
-                component = ComponentName("co.aospa.glyph", "co.aospa.glyph.Services.ThirdPartyService")
-            }
-            context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        } else {
-            Log.e("IGlyphServiceImpl", "Context is null, cannot bind service")
+        val intent = Intent("com.nothing.thirdparty.IGlyphService").apply {
+            component = ComponentName("co.aospa.glyph", "co.aospa.glyph.Services.ThirdPartyService")
+        }
+        if (!context.bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
+            Log.e("IGlyphServiceImpl", "Failed to bind the glyph engine service")
         }
     }
 
