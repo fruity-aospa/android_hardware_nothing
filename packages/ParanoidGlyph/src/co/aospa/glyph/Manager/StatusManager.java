@@ -23,23 +23,23 @@ public final class StatusManager {
     private static final String TAG = "GlyphStatusManager";
     private static final boolean DEBUG = true;
 
-    private static boolean allLedActive = false;
-    private static boolean animationActive = false;
-    private static boolean chargingAnimationActive = false;
-    private static boolean volumeAnimationActive = false;
-    private static boolean callLedActive = false;
-    private static boolean essentialLedActive = false;
-    private static boolean progressAnimationActive = false;
-    private static boolean batterySavingActive = false;
-    private static int progressType = 0;
-    private static int progressLedLast = 0;
-    private static int chargingLedLast = 0;
-    private static int[] batteryArray = null;
-    private static int volumeLedLast = 0;
-    private static int[] volumeArray = null;
-    private static int[] progressArray = null;
+    private static volatile boolean allLedActive = false;
+    private static volatile boolean animationActive = false;
+    private static volatile boolean chargingAnimationActive = false;
+    private static volatile boolean volumeAnimationActive = false;
+    private static volatile boolean callLedActive = false;
+    private static volatile boolean essentialLedActive = false;
+    private static volatile boolean progressAnimationActive = false;
+    private static volatile boolean batterySavingActive = false;
+    private static volatile int progressType = 0;
+    private static volatile int progressLedLast = 0;
+    private static volatile int chargingLedLast = 0;
+    private static volatile int[] batteryArray = null;
+    private static volatile int volumeLedLast = 0;
+    private static volatile int[] volumeArray = null;
+    private static volatile int[] progressArray = null;
 
-    private static boolean callLedEnabled = false;
+    private static volatile boolean callLedEnabled = false;
 
     public static boolean isAnimationActive() {
         return animationActive;
