@@ -34,9 +34,9 @@ import co.aospa.glyph.Manager.AnimationManager;
 import co.aospa.glyph.Manager.SettingsManager;
 import co.aospa.glyph.Manager.StatusManager;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ProgressService extends Service {
 
@@ -56,11 +56,13 @@ public class ProgressService extends Service {
 
     private MediaSessionManager mMediaSessionManager;
 
-    private Map<String, ProgressInfo> mActiveProgress = new HashMap<>();
-    private int mLastDisplayedProgress = -1;
-    private String mLastDisplayedKey = null;
+    // Receiver callbacks land on the main thread while the checker sweeps this
+    // map on the handler thread; never use a plain HashMap here.
+    private Map<String, ProgressInfo> mActiveProgress = new ConcurrentHashMap<>();
+    private volatile int mLastDisplayedProgress = -1;
+    private volatile String mLastDisplayedKey = null;
 
-    private int mLastMediaProgress = 0;
+    private volatile int mLastMediaProgress = 0;
 
     private Runnable mProgressChecker;
     private Runnable mMediaProgressChecker;
