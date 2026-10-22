@@ -102,7 +102,10 @@ public final class SettingsManager {
 
     public static int getGlyphBrightness() {
         int[] levels = Constants.getBrightnessLevels();
-        int brightnessSetting = getGlyphBrightnessSetting();
+        if (levels.length == 0) return Constants.MAX_PATTERN_BRIGHTNESS;
+        // The stored setting survives restores and overlay/device changes;
+        // an out-of-range value used to index straight out of the array.
+        int brightnessSetting = Math.min(Math.max(getGlyphBrightnessSetting(), 1), levels.length);
         return levels[brightnessSetting - 1];
     }
 

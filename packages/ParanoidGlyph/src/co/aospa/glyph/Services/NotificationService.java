@@ -37,8 +37,8 @@ import android.util.Log;
 
 import com.android.internal.util.ArrayUtils;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -66,8 +66,10 @@ public class NotificationService extends NotificationListenerService
 
     private SharedPreferences mSharedPreferences;
 
-    private final Map<String, Runnable> pendingCallbacks = new HashMap<>();
-    private final Map<String, Future<?>> pendingFutures = new HashMap<>();
+    // Written and removed from concurrent binder threads; a plain HashMap
+    // could corrupt or lose entries between onNotificationPosted/Removed.
+    private final Map<String, Runnable> pendingCallbacks = new ConcurrentHashMap<>();
+    private final Map<String, Future<?>> pendingFutures = new ConcurrentHashMap<>();
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
     private int SYNC_DELAY = 345;
@@ -320,7 +322,16 @@ public class NotificationService extends NotificationListenerService
         boolean playEssential = false;
         if (SettingsManager.isGlyphNotifsEnabled()) {
             if (!mNotificationManager.isNotificationPolicyAccessGranted()) return;
-            StatusBarNotification[] activeNotifications = getActiveNotifications();
+            StatusBarNotification[] activeNotifications;
+            try {
+                // The listener connection may not be established yet when the
+                // settings ContentObserver fires early (device unlock, boot).
+                activeNotifications = getActiveNotifications();
+            } catch (RuntimeException e) {
+                if (DEBUG) Log.w(TAG, "Notification listener not ready, skipping essential scan", e);
+                return;
+            }
+            if (activeNotifications == null) return;
             for (StatusBarNotification sbn : activeNotifications) {
                 String packageName = sbn.getPackageName();
                 String packageChannelID = sbn.getNotification().getChannelId();
