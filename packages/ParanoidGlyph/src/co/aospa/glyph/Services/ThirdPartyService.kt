@@ -10,13 +10,16 @@ import co.aospa.glyph.Manager.AnimationManager
 import co.aospa.glyph.Manager.StatusManager
 import com.nothing.thirdparty.IGlyphService
 
+// Flip to true to trace frame payloads from third-party SDK clients.
+private const val DEBUG = false
+
 class ThirdPartyService : Service() {
 
     private var wakeLock: PowerManager.WakeLock? = null
     private val wakeLockLock = Any()
     private val binder = object : IGlyphService.Stub() {
         override fun setFrameColors(iArray: IntArray?) {
-            Log.d("ThirdPartyService", "received data: ${iArray.contentToString()}")
+            if (DEBUG) Log.d("ThirdPartyService", "received data: ${iArray.contentToString()}")
             AnimationManager.updateLedFrame(iArray)
         }
 

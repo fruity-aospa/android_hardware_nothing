@@ -486,7 +486,9 @@ public final class AnimationManager {
             return;
         }
 
+        int emptyPasses = 0;
         while (StatusManager.isCallLedEnabled()) {
+            boolean frameRendered = false;
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                     ResourceUtils.getCallAnimation(name)))) {
                 Iterator<String> it = AnimationUtils.iterateCsvLines(reader, reversed);
@@ -497,6 +499,7 @@ public final class AnimationManager {
                     String[] pattern = line.split(",");
                     if (ArrayUtils.contains(Constants.getSupportedAnimationPatternLengths(), pattern.length)) {
                         updateLedFrame(pattern);
+                        frameRendered = true;
                     } else {
                         if (DEBUG) Log.d(TAG, "Animation line length mismatch | name: " + name + " | line: " + line);
                         throw new InterruptedException();
@@ -509,6 +512,18 @@ public final class AnimationManager {
                 }
             } catch (Exception e) {
                 if (DEBUG) Log.d(TAG, "Exception while playing animation | name: " + name + " | exception: " + e);
+                // A pass that got interrupted after rendering real frames keeps the
+                // loop alive; only count passes stuck at zero progress so a deleted
+                // or malformed CSV cannot spin the executor at line-load speed.
+                if (!frameRendered) {
+                    emptyPasses++;
+                    if (emptyPasses >= 3) {
+                        Log.w(TAG, "Call animation keeps failing, giving up | name: " + name);
+                        break;
+                    }
+                } else {
+                    emptyPasses = 0;
+                }
             } finally {
                 if (StatusManager.isAllLedActive()) {
                     if (DEBUG) Log.d(TAG, "All LED active, pause playing animation | name: " + name);

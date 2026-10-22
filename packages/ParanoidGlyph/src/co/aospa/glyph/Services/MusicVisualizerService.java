@@ -52,12 +52,13 @@ public class MusicVisualizerService extends Service {
     private static final int MODE_BRIGHTNESS = 1;
     private static final int MODE_BRIGHTNESS_INVERTED = 2;
 
-    private int mMode = MODE_BEAT;
+    private volatile int mMode = MODE_BEAT;
 
     private long mLastLedUpdate = 0;
     private static final long LED_FRAME_INTERVAL = 1000 / 60; // ~16ms
 
     private AudioManager mAudioManager;
+    private volatile boolean mDisposed = false;
     private HandlerThread thread;
     private Handler mHandler;
     private Visualizer mVisualizer;
@@ -111,15 +112,21 @@ public class MusicVisualizerService extends Service {
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         // Create a visualizer with the audio session ID (0) which takes the entire output mix
-        mVisualizer = new Visualizer(0);
-
-        // Set the capture size to the maximum available
-        bufferSize = Visualizer.getCaptureSizeRange()[1];
-        mVisualizer.setCaptureSize(bufferSize);
+        try {
+            mVisualizer = new Visualizer(0);
+            // Set the capture size to the maximum available
+            bufferSize = Visualizer.getCaptureSizeRange()[1];
+            mVisualizer.setCaptureSize(bufferSize);
+        } catch (Exception e) {
+            Log.e(TAG, "Visualizer unavailable, stopping music visualizer service", e);
+            stopSelf();
+            return;
+        }
         bandSnapshot = new HashSet<String>();
         prevSnapshot = new HashSet<String>();
 
         mHandler.post(() -> {
+            if (mDisposed) return;
             // Set data capture listener for visualizer
             mVisualizer.setDataCaptureListener(
                 new Visualizer.OnDataCaptureListener() {
@@ -130,7 +137,6 @@ public class MusicVisualizerService extends Service {
                     @Override
                     public void onFftDataCapture(Visualizer visualizer, byte[] fft, int samplingRate) {
                         if (mAudioManager.isMusicActive() && StatusManager.isGlyphIdle()) {
-                            if (DEBUG) Log.d(TAG, "Music is active");
                             processAudioFFT(fft, samplingRate);
                         } else if (!mAudioManager.isMusicActive() && StatusManager.isGlyphIdle() && !prevSnapshot.isEmpty()) {
                             AnimationManager.clearLEDs();
@@ -165,14 +171,21 @@ public class MusicVisualizerService extends Service {
     @Override
     public void onDestroy() {
         if (DEBUG) Log.d(TAG, "Destroying service");
-        mVisualizer.setEnabled(false);
-        mVisualizer.release();
+        mDisposed = true;
+        if (mVisualizer != null) {
+            mVisualizer.setEnabled(false);
+            mVisualizer.release();
+        }
         if (PULSE_PREVIOUS_STATE) {
             SettingsManager.setIntSecure(pulsePrefKey, true);
         }
-        PulseSettingObserver.unregister(getContentResolver());
+        if (PulseSettingObserver != null) {
+            PulseSettingObserver.unregister(getContentResolver());
+        }
         AnimationManager.clearLEDs();
-        thread.quit();
+        if (thread != null) {
+            thread.quit();
+        }
         super.onDestroy();
     }
 
