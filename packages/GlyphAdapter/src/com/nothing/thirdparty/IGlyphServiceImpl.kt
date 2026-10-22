@@ -60,4 +60,22 @@ class IGlyphServiceImpl(private val context: Context) : IGlyphService.Stub() {
 
     override fun register(str: String) = true
     override fun registerSDK(str1: String, str2: String) = true
+
+    override fun registerMatrixSDK(str: String) = glyphService?.registerMatrixSDK(str) ?: false
+
+    override fun setMatrixColors(iArray: IntArray?) {
+        glyphService?.setMatrixColors(iArray)
+    }
+
+    override fun setGlyphMatrixTimeout(active: Boolean) {
+        glyphService?.setGlyphMatrixTimeout(active)
+    }
+
+    override fun setAppMatrixColors(iArray: IntArray?) {
+        glyphService?.setAppMatrixColors(iArray)
+    }
+
+    override fun closeAppMatrix() {
+        glyphService?.closeAppMatrix()
+    }
 }
