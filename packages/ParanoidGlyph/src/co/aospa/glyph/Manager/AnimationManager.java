@@ -372,14 +372,15 @@ public final class AnimationManager {
 
         acquireWakeLock(context);
 
-        StatusManager.setAnimationActive(true);
-        StatusManager.setVolumeAnimationActive(true);
-
         int[] volumeArray = StatusManager.getVolumeArray();
         if (volumeArray == null) {
             if (DEBUG) Log.d(TAG, "Volume array is null, cannot play animation");
+            releaseWakeLock();
             return;
         }
+
+        StatusManager.setAnimationActive(true);
+        StatusManager.setVolumeAnimationActive(true);
 
         int amount = (int) Math.round((volumeLevel / 100D) * volumeArray.length);
         int last = StatusManager.getVolumeLedLast();
@@ -485,7 +486,9 @@ public final class AnimationManager {
             return;
         }
 
+        int emptyPasses = 0;
         while (StatusManager.isCallLedEnabled()) {
+            boolean frameRendered = false;
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                     ResourceUtils.getCallAnimation(name)))) {
                 Iterator<String> it = AnimationUtils.iterateCsvLines(reader, reversed);
@@ -496,6 +499,7 @@ public final class AnimationManager {
                     String[] pattern = line.split(",");
                     if (ArrayUtils.contains(Constants.getSupportedAnimationPatternLengths(), pattern.length)) {
                         updateLedFrame(pattern);
+                        frameRendered = true;
                     } else {
                         if (DEBUG) Log.d(TAG, "Animation line length mismatch | name: " + name + " | line: " + line);
                         throw new InterruptedException();
@@ -508,6 +512,18 @@ public final class AnimationManager {
                 }
             } catch (Exception e) {
                 if (DEBUG) Log.d(TAG, "Exception while playing animation | name: " + name + " | exception: " + e);
+                // A pass that got interrupted after rendering real frames keeps the
+                // loop alive; only count passes stuck at zero progress so a deleted
+                // or malformed CSV cannot spin the executor at line-load speed.
+                if (!frameRendered) {
+                    emptyPasses++;
+                    if (emptyPasses >= 3) {
+                        Log.w(TAG, "Call animation keeps failing, giving up | name: " + name);
+                        break;
+                    }
+                } else {
+                    emptyPasses = 0;
+                }
             } finally {
                 if (StatusManager.isAllLedActive()) {
                     if (DEBUG) Log.d(TAG, "All LED active, pause playing animation | name: " + name);
@@ -645,31 +661,40 @@ public final class AnimationManager {
 
     public static void playMusic(int[] bandBrightness) {
 
-        int[] pattern;
-
-        if (Constants.Device.isPhone3a()) {
-
-            int[] zoneDefs = ResourceUtils.getIntArray("glyph_zone_channel_count");
-
-            int[] zone1 = new int[zoneDefs[1]]; // largest (left 1)
-            int[] zone2 = new int[zoneDefs[0]]; // medium (right)
-            int[] zone3 = new int[zoneDefs[2]]; // smallest (left 2)
-
-            Arrays.fill(zone1, bandBrightness[1]); // mid-low
-            Arrays.fill(zone2, bandBrightness[2]); // mid
-            Arrays.fill(zone3, bandBrightness[4]); // high
-
-            pattern = AnimationUtils.buildPatternArray(zone1, zone2, zone3);
-        } else {
-            pattern = new int[5];
-            pattern[4] = bandBrightness[0]; // low
-            pattern[3] = bandBrightness[1]; // mid-low
-            pattern[2] = bandBrightness[2]; // mid
-            pattern[0] = bandBrightness[3]; // mid-high
-            pattern[1] = bandBrightness[4]; // high
+        if (bandBrightness == null || bandBrightness.length < 5) {
+            if (DEBUG) Log.d(TAG, "Music band data unavailable, skipping frame");
+            return;
         }
 
         try {
+            int[] pattern;
+
+            if (Constants.Device.isPhone3a()) {
+
+                int[] zoneDefs = ResourceUtils.getIntArray("glyph_zone_channel_count");
+                if (zoneDefs == null || zoneDefs.length < 3) {
+                    if (DEBUG) Log.d(TAG, "Zone channels unavailable, skipping music frame");
+                    return;
+                }
+
+                int[] zone1 = new int[zoneDefs[1]]; // largest (left 1)
+                int[] zone2 = new int[zoneDefs[0]]; // medium (right)
+                int[] zone3 = new int[zoneDefs[2]]; // smallest (left 2)
+
+                Arrays.fill(zone1, bandBrightness[1]); // mid-low
+                Arrays.fill(zone2, bandBrightness[2]); // mid
+                Arrays.fill(zone3, bandBrightness[4]); // high
+
+                pattern = AnimationUtils.buildPatternArray(zone1, zone2, zone3);
+            } else {
+                pattern = new int[5];
+                pattern[4] = bandBrightness[0]; // low
+                pattern[3] = bandBrightness[1]; // mid-low
+                pattern[2] = bandBrightness[2]; // mid
+                pattern[0] = bandBrightness[3]; // mid-high
+                pattern[1] = bandBrightness[4]; // high
+            }
+
             if (StatusManager.isGlyphIdle()) {
                 updateLedFrame(pattern);
             }
@@ -682,50 +707,54 @@ public final class AnimationManager {
     public static void playMusic(Set<String> snapshot) {
         float maxPatternBrightness = (float) Constants.MAX_PATTERN_BRIGHTNESS;
 
-        float[] pattern;
-
-        if (Constants.Device.isPhone3a()) {
-
-            int[] zoneDefs = ResourceUtils.getIntArray("glyph_zone_channel_count");
-
-            float[] zone1 = new float[zoneDefs[1]]; // largest (left 1)
-            float[] zone2 = new float[zoneDefs[0]]; // medium (right)
-            float[] zone3 = new float[zoneDefs[2]]; // smallest (left 2)
-
-            if (snapshot.contains("low")) {
-                Arrays.fill(zone1, maxPatternBrightness);
-            }
-            if (snapshot.contains("mid")) {
-                Arrays.fill(zone2, maxPatternBrightness);
-            }
-            if (snapshot.contains("high")) {
-                Arrays.fill(zone3, maxPatternBrightness);
-            }
-
-            pattern = AnimationUtils.buildPatternArray(zone1, zone2, zone3);
-            // pattern = float[zone1.length + zone2.length + zone3.length] fill with zone values
-
-        } else {
-            pattern = new float[5];
-
-            if (snapshot.contains("low")) {
-                pattern[4] = maxPatternBrightness;
-            }
-            if (snapshot.contains("mid_low")) {
-                pattern[3] = maxPatternBrightness;
-            }
-            if (snapshot.contains("mid")) {
-                pattern[2] = maxPatternBrightness;
-            }
-            if (snapshot.contains("mid_high")) {
-                pattern[0] = maxPatternBrightness;
-            }
-            if (snapshot.contains("high")) {
-                pattern[1] = maxPatternBrightness;
-            }
-        }
-
         try {
+            float[] pattern;
+
+            if (Constants.Device.isPhone3a()) {
+
+                int[] zoneDefs = ResourceUtils.getIntArray("glyph_zone_channel_count");
+                if (zoneDefs == null || zoneDefs.length < 3) {
+                    if (DEBUG) Log.d(TAG, "Zone channels unavailable, skipping music frame");
+                    return;
+                }
+
+                float[] zone1 = new float[zoneDefs[1]]; // largest (left 1)
+                float[] zone2 = new float[zoneDefs[0]]; // medium (right)
+                float[] zone3 = new float[zoneDefs[2]]; // smallest (left 2)
+
+                if (snapshot.contains("low")) {
+                    Arrays.fill(zone1, maxPatternBrightness);
+                }
+                if (snapshot.contains("mid")) {
+                    Arrays.fill(zone2, maxPatternBrightness);
+                }
+                if (snapshot.contains("high")) {
+                    Arrays.fill(zone3, maxPatternBrightness);
+                }
+
+                pattern = AnimationUtils.buildPatternArray(zone1, zone2, zone3);
+                // pattern = float[zone1.length + zone2.length + zone3.length] fill with zone values
+
+            } else {
+                pattern = new float[5];
+
+                if (snapshot.contains("low")) {
+                    pattern[4] = maxPatternBrightness;
+                }
+                if (snapshot.contains("mid_low")) {
+                    pattern[3] = maxPatternBrightness;
+                }
+                if (snapshot.contains("mid")) {
+                    pattern[2] = maxPatternBrightness;
+                }
+                if (snapshot.contains("mid_high")) {
+                    pattern[0] = maxPatternBrightness;
+                }
+                if (snapshot.contains("high")) {
+                    pattern[1] = maxPatternBrightness;
+                }
+            }
+
             if (StatusManager.isGlyphIdle()) {
                 updateLedFrame(pattern);
             }
@@ -871,15 +900,16 @@ public final class AnimationManager {
 
         acquireWakeLock(context);
 
-        StatusManager.setAnimationActive(true);
-        StatusManager.setProgressAnimationActive(true);
-        StatusManager.setProgressType(progressType);
-
         int[] progressArray = StatusManager.getProgressArray();
         if (progressArray == null) {
             if (DEBUG) Log.d(TAG, "Progress array is null, cannot play animation");
+            releaseWakeLock();
             return;
         }
+
+        StatusManager.setAnimationActive(true);
+        StatusManager.setProgressAnimationActive(true);
+        StatusManager.setProgressType(progressType);
 
         int amount = (int) Math.round((progressPercent / 100D) * progressArray.length);
         int last = StatusManager.getProgressLedLast();

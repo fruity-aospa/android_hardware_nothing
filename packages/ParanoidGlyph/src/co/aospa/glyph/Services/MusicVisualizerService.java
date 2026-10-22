@@ -52,12 +52,13 @@ public class MusicVisualizerService extends Service {
     private static final int MODE_BRIGHTNESS = 1;
     private static final int MODE_BRIGHTNESS_INVERTED = 2;
 
-    private int mMode = MODE_BEAT;
+    private volatile int mMode = MODE_BEAT;
 
     private long mLastLedUpdate = 0;
     private static final long LED_FRAME_INTERVAL = 1000 / 60; // ~16ms
 
     private AudioManager mAudioManager;
+    private volatile boolean mDisposed = false;
     private HandlerThread thread;
     private Handler mHandler;
     private Visualizer mVisualizer;
@@ -111,15 +112,21 @@ public class MusicVisualizerService extends Service {
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         // Create a visualizer with the audio session ID (0) which takes the entire output mix
-        mVisualizer = new Visualizer(0);
-
-        // Set the capture size to the maximum available
-        bufferSize = Visualizer.getCaptureSizeRange()[1];
-        mVisualizer.setCaptureSize(bufferSize);
+        try {
+            mVisualizer = new Visualizer(0);
+            // Set the capture size to the maximum available
+            bufferSize = Visualizer.getCaptureSizeRange()[1];
+            mVisualizer.setCaptureSize(bufferSize);
+        } catch (Exception e) {
+            Log.e(TAG, "Visualizer unavailable, stopping music visualizer service", e);
+            stopSelf();
+            return;
+        }
         bandSnapshot = new HashSet<String>();
         prevSnapshot = new HashSet<String>();
 
         mHandler.post(() -> {
+            if (mDisposed) return;
             // Set data capture listener for visualizer
             mVisualizer.setDataCaptureListener(
                 new Visualizer.OnDataCaptureListener() {
@@ -130,7 +137,6 @@ public class MusicVisualizerService extends Service {
                     @Override
                     public void onFftDataCapture(Visualizer visualizer, byte[] fft, int samplingRate) {
                         if (mAudioManager.isMusicActive() && StatusManager.isGlyphIdle()) {
-                            if (DEBUG) Log.d(TAG, "Music is active");
                             processAudioFFT(fft, samplingRate);
                         } else if (!mAudioManager.isMusicActive() && StatusManager.isGlyphIdle() && !prevSnapshot.isEmpty()) {
                             AnimationManager.clearLEDs();
@@ -165,14 +171,21 @@ public class MusicVisualizerService extends Service {
     @Override
     public void onDestroy() {
         if (DEBUG) Log.d(TAG, "Destroying service");
-        mVisualizer.setEnabled(false);
-        mVisualizer.release();
+        mDisposed = true;
+        if (mVisualizer != null) {
+            mVisualizer.setEnabled(false);
+            mVisualizer.release();
+        }
         if (PULSE_PREVIOUS_STATE) {
             SettingsManager.setIntSecure(pulsePrefKey, true);
         }
-        PulseSettingObserver.unregister(getContentResolver());
+        if (PulseSettingObserver != null) {
+            PulseSettingObserver.unregister(getContentResolver());
+        }
         AnimationManager.clearLEDs();
-        thread.quit();
+        if (thread != null) {
+            thread.quit();
+        }
         super.onDestroy();
     }
 
@@ -241,6 +254,7 @@ public class MusicVisualizerService extends Service {
     }
 
     private void processAudioFFT(byte[] audioBytes, int samplingRate) {
+        if (audioBytes == null || audioBytes.length < 4) return;
         bandSnapshot.clear();
         // The first byte is the DC component of the FFT result (real only)
         int energySum = Math.abs(audioBytes[0]);
@@ -253,7 +267,7 @@ public class MusicVisualizerService extends Service {
 
         // Sum the energy in the low frequency band
         int bandStartK = k;
-        while (nextFrequency < LOW_FREQUENCY) {
+        while (nextFrequency < LOW_FREQUENCY && k + 1 < audioBytes.length) {
                 // Calculate the energy of the current frequency
             energySum += (int) Math.sqrt(audioBytes[k] * audioBytes[k] + audioBytes[k + 1] * audioBytes[k + 1]);
 
@@ -264,7 +278,7 @@ public class MusicVisualizerService extends Service {
 
         // Calculate the average energy in the low frequency band
         int binsInBand = (k - bandStartK) / 2;
-        double sampleAvgAudioEnergy = energySum / (double) binsInBand;
+        double sampleAvgAudioEnergy = binsInBand >= 1 ? energySum / (double) binsInBand : 0.0;
         if (mMode == MODE_BRIGHTNESS || mMode == MODE_BRIGHTNESS_INVERTED) bandEnergies[0] = sampleAvgAudioEnergy;
         mCurrentAvgEnergy[0] = mCurrentAvgEnergy[0] * 0.99 + sampleAvgAudioEnergy * 0.01;
 
@@ -283,7 +297,7 @@ public class MusicVisualizerService extends Service {
 
         // Sum the energy in the mid-low frequency band
         bandStartK = k;
-        while (nextFrequency < MID_LOW_FREQUENCY) {
+        while (nextFrequency < MID_LOW_FREQUENCY && k + 1 < audioBytes.length) {
             // Calculate the energy of the current frequency
             energySum += (int) Math.sqrt(audioBytes[k] * audioBytes[k] + audioBytes[k + 1] * audioBytes[k + 1]);
 
@@ -294,7 +308,7 @@ public class MusicVisualizerService extends Service {
 
         // Calculate the average energy in the mid-low frequency band
         binsInBand = (k - bandStartK) / 2;
-        sampleAvgAudioEnergy = energySum / (double) binsInBand;
+        sampleAvgAudioEnergy = binsInBand >= 1 ? energySum / (double) binsInBand : 0.0;
         if (mMode == MODE_BRIGHTNESS || mMode == MODE_BRIGHTNESS_INVERTED) bandEnergies[1] = sampleAvgAudioEnergy;
         mCurrentAvgEnergy[1] = mCurrentAvgEnergy[1] * 0.99 + sampleAvgAudioEnergy * 0.01;
 
@@ -311,7 +325,7 @@ public class MusicVisualizerService extends Service {
 
         // Sum the energy in the mid frequency band
         bandStartK = k;
-        while (nextFrequency < MID_FREQUENCY) {
+        while (nextFrequency < MID_FREQUENCY && k + 1 < audioBytes.length) {
             // Calculate the energy of the current frequency
             energySum += (int) Math.sqrt(audioBytes[k] * audioBytes[k] + audioBytes[k + 1]
                     * audioBytes[k + 1]);
@@ -323,7 +337,7 @@ public class MusicVisualizerService extends Service {
 
         // Calculate the average energy in the mid frequency band
         binsInBand = (k - bandStartK) / 2;
-        sampleAvgAudioEnergy = energySum / (double) binsInBand;
+        sampleAvgAudioEnergy = binsInBand >= 1 ? energySum / (double) binsInBand : 0.0;
         if (mMode == MODE_BRIGHTNESS || mMode == MODE_BRIGHTNESS_INVERTED) bandEnergies[2] = sampleAvgAudioEnergy;
         mCurrentAvgEnergy[2] = mCurrentAvgEnergy[2] * 0.99 + sampleAvgAudioEnergy * 0.01;
 
@@ -339,7 +353,7 @@ public class MusicVisualizerService extends Service {
 
         // Sum the energy in the mid-high frequency band
         bandStartK = k;
-        while (nextFrequency < MID_HIGH_FREQUENCY) {
+        while (nextFrequency < MID_HIGH_FREQUENCY && k + 1 < audioBytes.length) {
             // Calculate the energy of the current frequency
             energySum += (int) Math.sqrt(audioBytes[k] * audioBytes[k] + audioBytes[k + 1]
                     * audioBytes[k + 1]);
@@ -351,7 +365,7 @@ public class MusicVisualizerService extends Service {
 
         // Calculate the average energy in the mid-high frequency band
         binsInBand = (k - bandStartK) / 2;
-        sampleAvgAudioEnergy = energySum / (double) binsInBand;
+        sampleAvgAudioEnergy = binsInBand >= 1 ? energySum / (double) binsInBand : 0.0;
         if (mMode == MODE_BRIGHTNESS || mMode == MODE_BRIGHTNESS_INVERTED) bandEnergies[3] = sampleAvgAudioEnergy;
         mCurrentAvgEnergy[3] = mCurrentAvgEnergy[3] * 0.99 + sampleAvgAudioEnergy * 0.01;
 
@@ -368,7 +382,7 @@ public class MusicVisualizerService extends Service {
 
         // Sum the energy in the high frequency band
         bandStartK = k;
-        while (nextFrequency < HIGH_FREQUENCY) {
+        while (nextFrequency < HIGH_FREQUENCY && k + 1 < audioBytes.length) {
             // Calculate the energy of the current frequency
             energySum += (int) Math.sqrt(audioBytes[k] * audioBytes[k] + audioBytes[k + 1]
                     * audioBytes[k + 1]);
@@ -380,7 +394,7 @@ public class MusicVisualizerService extends Service {
 
         // Calculate the average energy in the high frequency band
         binsInBand = (k - bandStartK) / 2;
-        sampleAvgAudioEnergy = energySum / (double) binsInBand;
+        sampleAvgAudioEnergy = binsInBand >= 1 ? energySum / (double) binsInBand : 0.0;
         if (mMode == MODE_BRIGHTNESS || mMode == MODE_BRIGHTNESS_INVERTED) bandEnergies[4] = sampleAvgAudioEnergy;
         mCurrentAvgEnergy[4] = mCurrentAvgEnergy[4] * 0.99 + sampleAvgAudioEnergy * 0.01;
 

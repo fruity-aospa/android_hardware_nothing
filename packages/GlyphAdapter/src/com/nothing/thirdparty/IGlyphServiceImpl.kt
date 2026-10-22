@@ -12,6 +12,9 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
 
+// Flip to true to trace frame payloads forwarded from SDK clients to the engine.
+private const val DEBUG = false
+
 class IGlyphServiceImpl(private val context: Context) : IGlyphService.Stub() {
     @Volatile
     private var glyphService: IGlyphService? = null
@@ -48,7 +51,7 @@ class IGlyphServiceImpl(private val context: Context) : IGlyphService.Stub() {
     }
 
     override fun setFrameColors(iArray: IntArray?) {
-        Log.i("IGlyphServiceImpl", "updateLedFrame - ${iArray.contentToString()}")
+        if (DEBUG) Log.i("IGlyphServiceImpl", "updateLedFrame - ${iArray.contentToString()}")
         if (iArray != null) {
             glyphService?.setFrameColors(iArray)
         }
