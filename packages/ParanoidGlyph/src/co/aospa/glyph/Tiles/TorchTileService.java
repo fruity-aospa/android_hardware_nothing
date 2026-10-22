@@ -81,37 +81,42 @@ public class TorchTileService extends TileService {
     }
 
     private void updateState() {
+        // getQsTile() is only non-null while the tile service is bound and
+        // visible; broadcasts can arrive outside that window.
+        Tile tile = getQsTile();
+        if (tile == null) return;
         if (!TorchService.isRunning || Constants.CONTEXT == null) {
-            getQsTile().setState(Tile.STATE_UNAVAILABLE);
-            getQsTile().setSubtitle(getString(R.string.glyph_accessibility_quick_settings_unavailable));
-            getQsTile().updateTile();
+            tile.setState(Tile.STATE_UNAVAILABLE);
+            tile.setSubtitle(getString(R.string.glyph_accessibility_quick_settings_unavailable));
+            tile.updateTile();
             return;
         }
-        
+
         boolean enabled = getEnabled();
-        getQsTile().setSubtitle(enabled ?
+        tile.setSubtitle(enabled ?
                 getString(R.string.glyph_accessibility_quick_settings_on) :
                 getString(R.string.glyph_accessibility_quick_settings_off));
-        getQsTile().setState(enabled ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
-        getQsTile().updateTile();
+        tile.setState(enabled ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
+        tile.updateTile();
     }
 
     @Override
     public void onClick() {
         super.onClick();
+        Tile tile = getQsTile();
+        if (tile == null) return;
         boolean newState = !getEnabled();
         setEnabled(newState);
 
-        getQsTile().setState(
-                newState ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
+        tile.setState(newState ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
 
-        getQsTile().setSubtitle(
+        tile.setSubtitle(
                 newState ?
                         getString(R.string.glyph_accessibility_quick_settings_on) :
                         getString(R.string.glyph_accessibility_quick_settings_off)
         );
 
-        getQsTile().updateTile();
+        tile.updateTile();
     }
 
     @Override

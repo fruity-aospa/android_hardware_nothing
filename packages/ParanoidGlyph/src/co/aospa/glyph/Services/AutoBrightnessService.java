@@ -40,9 +40,8 @@ public class AutoBrightnessService extends Service {
 
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
-    private static int sensorType;
-    private static final int[] AutoBrightnessLux = ResourceUtils.getIntArray("glyph_auto_brightness_levels");
-    private static final int[] BrightnessValues = Constants.getBrightnessLevels();
+    private int[] autoBrightnessLux;
+    private int[] brightnessValues;
 
     @Override
     public void onCreate() {
@@ -50,8 +49,20 @@ public class AutoBrightnessService extends Service {
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
+        // Resolve device resources here rather than in class initializers: a
+        // missing overlay crashed the whole app process at first class load.
+        try {
+            autoBrightnessLux = ResourceUtils.getIntArray("glyph_auto_brightness_levels");
+            brightnessValues = Constants.getBrightnessLevels();
+        } catch (Exception e) {
+            Log.w(TAG, "Auto brightness resources missing, feature disabled", e);
+            stopSelf();
+            return;
+        }
+
         // Get light sensor type
         String sensorName = ResourceUtils.getString("glyph_light_sensor");
+        int sensorType = -1;
         List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
         for (Sensor sensor : sensors) {
             if (sensorName.equals(sensor.getStringType())) {
@@ -60,7 +71,12 @@ public class AutoBrightnessService extends Service {
             }
         }
 
-        mLightSensor = mSensorManager.getDefaultSensor(sensorType);
+        mLightSensor = sensorType >= 0 ? mSensorManager.getDefaultSensor(sensorType) : null;
+        if (mLightSensor == null) {
+            Log.w(TAG, "Light sensor \"" + sensorName + "\" not found, auto brightness disabled");
+            stopSelf();
+            return;
+        }
         mSensorManager.registerListener(mSensorEventListener,
             mLightSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
@@ -74,7 +90,9 @@ public class AutoBrightnessService extends Service {
     @Override
     public void onDestroy() {
         if (DEBUG) Log.d(TAG, "Destroying service");
-        mSensorManager.unregisterListener(mSensorEventListener);
+        if (mSensorManager != null) {
+            mSensorManager.unregisterListener(mSensorEventListener);
+        }
         super.onDestroy();
     }
 
@@ -86,25 +104,32 @@ public class AutoBrightnessService extends Service {
     private final SensorEventListener mSensorEventListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent event) {
+            if (brightnessValues == null || brightnessValues.length == 0
+                    || autoBrightnessLux == null || autoBrightnessLux.length == 0) {
+                return;
+            }
             int lux = (int) event.values[0];
             int lux_index = 0;
             int brightnessValue;
 
-            for (int i = 1; i < AutoBrightnessLux.length; i++) {
-                if (lux < AutoBrightnessLux[i]) {
-                    break;
-                } else if (lux >= AutoBrightnessLux[i]) {
+            for (int i = 1; i < autoBrightnessLux.length; i++) {
+                if (lux >= autoBrightnessLux[i]) {
                     lux_index = i;
+                } else {
+                    break;
                 }
             }
 
-            brightnessValue = BrightnessValues[lux_index];
+            // Both resource arrays come from overlays that can be misaligned;
+            // clamp so a longer lux list cannot index out of the levels array.
+            lux_index = Math.min(lux_index, brightnessValues.length - 1);
+            brightnessValue = brightnessValues[lux_index];
 
             if (brightnessValue != Constants.getBrightness()) {
                 if (DEBUG) {
-                    int led_lux = AutoBrightnessLux[lux_index];
-                    Log.d(TAG, "Brightness changed: " + "RealLux: " + lux + 
-                    " | BrightnessLux: " + led_lux + " | BrightnessValue: " + brightnessValue);
+                    int ledLux = autoBrightnessLux[Math.min(lux_index, autoBrightnessLux.length - 1)];
+                    Log.d(TAG, "Brightness changed: " + "RealLux: " + lux +
+                    " | BrightnessLux: " + ledLux + " | BrightnessValue: " + brightnessValue);
                 }
                 Constants.setBrightness(brightnessValue);
                 if (StatusManager.isEssentialLedActive())

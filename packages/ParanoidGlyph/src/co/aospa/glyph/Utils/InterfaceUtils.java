@@ -92,8 +92,11 @@ public class InterfaceUtils {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Set<String> selected = prefs.getStringSet(preference.getKey(), new HashSet<>());
 
+        // Entries and values come from separately-maintained arrays; trust the
+        // shorter of the two so a misalignment cannot index out of bounds.
+        int count = Math.min(entries.length, values.length);
         boolean[] checked = new boolean[entries.length];
-        for (int i = 0; i < values.length; i++) {
+        for (int i = 0; i < count; i++) {
             checked[i] = selected.contains(values[i]);
         }
 
@@ -104,7 +107,7 @@ public class InterfaceUtils {
                 })
                 .setOnDismissListener(dialog -> {
                     Set<String> newSelected = new HashSet<>();
-                    for (int i = 0; i < checked.length; i++) {
+                    for (int i = 0; i < count; i++) {
                         if (checked[i]) newSelected.add(values[i]);
                     }
                     prefs.edit().putStringSet(preference.getKey(), newSelected).apply();
