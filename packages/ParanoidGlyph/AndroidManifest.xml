@@ -33,6 +33,7 @@
     <uses-permission android:name="android.permission.BIND_INCALL_SERVICE" />
 
     <application
+        android:name=".GlyphApplication"
         android:label="@string/glyph_settings_app_name"
         android:persistent="true"
         android:defaultToDeviceProtectedStorage="true"
