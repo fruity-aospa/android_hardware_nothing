@@ -10,3 +10,4 @@ binder_call(sltntc, servicemanager)
 
 allow sltntc sltntc_service:service_manager find;
 rw_dir_file(sltntc, sysfs_virtual_temp)
+r_dir_file(sltntc, sysfs_thermal)
