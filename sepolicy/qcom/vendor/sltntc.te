@@ -1,0 +1,4 @@
+# Charger state and SoC id feed the shell temperature model.
+r_dir_file(sltntc, vendor_sysfs_battery_supply)
+r_dir_file(sltntc, vendor_sysfs_usb_supply)
+r_dir_file(sltntc, vendor_sysfs_public)
