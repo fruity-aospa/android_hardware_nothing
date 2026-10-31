@@ -23,7 +23,7 @@ android_app {
         "androidx.core_core",
         "androidx.preference_preference",
         "extphonelib",
-        "org.lineageos.settings.resources",
+        "co.aospa.resources",
     ],
 
     optimize: {
