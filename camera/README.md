@@ -1,17 +1,17 @@
 # Nothing Camera for Nothing Phone (3a)
 
 Nothing Camera (`com.nothing.camera`) for the Nothing Phone (3a) / (3a) Pro
-(asteroids), as a drop-in extract-utils vendor repository.
-Clone to `vendor/nothing/camera` and run `git lfs pull`.
+(asteroids), as an extract-utils vendor tree in `hardware/nothing/camera`.
+Run `git lfs pull` in `hardware/nothing` after syncing.
 
 ## Integration
 
 ```make
 # BoardConfig.mk
--include vendor/nothing/camera/BoardConfigCamera.mk
+-include hardware/nothing/camera/BoardConfigCamera.mk
 
 # device.mk
-$(call inherit-product-if-exists, vendor/nothing/camera/nothing-camera.mk)
+$(call inherit-product-if-exists, hardware/nothing/camera/nothing-camera.mk)
 ```
 
 Both are optional includes, so the device still builds without this repo
