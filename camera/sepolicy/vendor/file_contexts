@@ -1,0 +1,8 @@
+/vendor/bin/hw/vendor\.noth\.hardware\.camera-service    u:object_r:hal_camera_default_exec:s0
+# QNN libraries dlopened by the camera algorithm stack inside app processes
+# (same_process_hal_file is one of the vendor files core domain may read).
+/vendor/lib64/libQnnHtp\.so                                         u:object_r:same_process_hal_file:s0
+/vendor/lib64/libQnnSystem\.so                                      u:object_r:same_process_hal_file:s0
+/vendor/lib64/libQnnHtpV73Stub\.so                                  u:object_r:same_process_hal_file:s0
+/vendor/lib/rfsa/adsp/libQnnHtpV73\.so                              u:object_r:same_process_hal_file:s0
+/vendor/lib/rfsa/adsp/libQnnHtpV73Skel\.so                          u:object_r:same_process_hal_file:s0

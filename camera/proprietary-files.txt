@@ -1,0 +1,19 @@
+# Nothing Camera
+system_ext/priv-app/NTCamera/NTCamera.apk;EXTRACT_ONLY|2f1e98a0514e0b9a2ee5710f285b7a688d9d32bb
+system_ext/etc/permissions/privapp-permissions-NTCamera.xml
+system/etc/sysconfig/nothing-hiddenapi-package-allowlist.xml
+system_ext/lib64/libofflineproc_jni.so|9bf326e94cba4841089d746917ee398c6c2c1e20
+
+# Nothing Camera algorithm service
+vendor/bin/hw/vendor.noth.hardware.camera-service
+vendor/etc/init/vendor.noth.hardware.camera-service.rc
+vendor/etc/vintf/manifest/vendor.noth.hardware.camera-service.xml
+vendor/lib64/vendor.noth.hardware.camera-V1-ndk.so
+vendor/lib64/vendor.noth.hardware.camera-service-impl.so
+
+# Watermark fonts (libntcamskia)
+vendor/etc/camera/NdotFont/Ndot-55.otf
+vendor/etc/camera/Robotofont/Roboto-55.ttf
+vendor/etc/camera/SansCJKFont/NotoSansCJK.ttc
+vendor/lib64/libQnnHtpV73Stub.so|f5762c42630e0052d10ba16c404f86325dca4b3f
+system_ext/lib64/libntcam_client.so|8ba9033fce8d903eb5950f92b9f0bfa2916e60c4

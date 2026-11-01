@@ -1,0 +1,6 @@
+attribute vendor_hal_noth_camera;
+expandattribute vendor_hal_noth_camera true;
+attribute vendor_hal_noth_camera_client;
+expandattribute vendor_hal_noth_camera_client true;
+attribute vendor_hal_noth_camera_server;
+expandattribute vendor_hal_noth_camera_server false;

@@ -1,0 +1,58 @@
+//
+// SPDX-FileCopyrightText: Paranoid Android
+// SPDX-License-Identifier: Apache-2.0
+//
+
+filegroup {
+    name: "offlineproc_aidl",
+    srcs: [
+        "aidl/android/hardware/IOfflineProcClient.aidl",
+        "aidl/android/hardware/IOfflineProcService.aidl",
+    ],
+    path: "aidl",
+}
+
+// Nothing OS ships IOfflineProcService, OfflineProcClient and
+// OfflineParameters inside its libcamera_client; libofflineproc_jni.so is
+// linked against them.
+cc_library_shared {
+    name: "libofflineproc_shim",
+    system_ext_specific: true,
+    srcs: [
+        ":offlineproc_aidl",
+        "OfflineParameters.cpp",
+        "OfflineProcClient.cpp",
+    ],
+    aidl: {
+        local_include_dirs: ["aidl"],
+        include_dirs: ["frameworks/av/camera/aidl"],
+        export_aidl_headers: true,
+    },
+    local_include_dirs: ["include"],
+    export_include_dirs: ["include"],
+    shared_libs: [
+        "libbinder",
+        "libcamera_client",
+        "libcutils",
+        "liblog",
+        "libutils",
+    ],
+    export_shared_lib_headers: [
+        "libbinder",
+        "libcamera_client",
+    ],
+}
+
+cc_binary {
+    name: "ntcam_offlineproc",
+    system_ext_specific: true,
+    srcs: ["service/main.cpp"],
+    init_rc: ["service/ntcam_offlineproc.rc"],
+    shared_libs: [
+        "libbinder",
+        "libcamera_client",
+        "liblog",
+        "libofflineproc_shim",
+        "libutils",
+    ],
+}

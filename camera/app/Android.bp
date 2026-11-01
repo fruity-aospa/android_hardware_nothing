@@ -1,0 +1,27 @@
+//
+// SPDX-FileCopyrightText: Paranoid Android
+// SPDX-License-Identifier: Apache-2.0
+//
+
+// Kept out of the generated Android.bp so the app is AOT compiled like on
+// stock instead of starting interpreted after every update. NTCamera.apk is a
+// symlink to the extracted (Git LFS) copy under proprietary/.
+android_app_import {
+    name: "NTCamera",
+    owner: "nothing",
+    apk: "NTCamera.apk",
+    certificate: "platform",
+    privileged: true,
+    system_ext_specific: true,
+    overrides: [
+        "Aperture",
+        "Camera2",
+    ],
+    optional_uses_libs: [
+        "androidx.window.extensions",
+        "androidx.window.sidecar",
+    ],
+    required: [
+        "libofflineproc_jni",
+    ],
+}

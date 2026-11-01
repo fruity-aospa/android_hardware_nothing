@@ -1,0 +1,8 @@
+# NTCamera's EXIF writer (com.ape.utils.exif.ExifInterface) and watermark read
+# ro.product.brand_device_name with an empty default, which breaks saving the
+# capture. Nothing OS sets it per variant; derive it from the bootloader pbid.
+on property:ro.boot.pbid=Pro
+    setprop ro.product.brand_device_name "Nothing Phone (3a) Pro"
+
+on property:ro.boot.pbid=Base
+    setprop ro.product.brand_device_name "Nothing Phone (3a)"
