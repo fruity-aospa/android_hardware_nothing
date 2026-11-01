@@ -1,0 +1,50 @@
+# Nothing camera algorithm service (vendor.noth.hardware.camera-service) runs in
+# hal_camera_default, the QTI camera provider domain. That domain already holds
+# what the service needs (postproc hwservice, vendor_camera_prop,
+# vendor_adsprpc_prop, DSP devices, gralloc), so
+# openSession() can build the CamX/QNN pipeline there.
+hal_server_domain(hal_camera_default, vendor_hal_noth_camera)
+hal_attribute_service(vendor_hal_noth_camera, vendor_hal_noth_camera_service)
+
+hal_client_domain(platform_app, vendor_hal_noth_camera)
+hal_client_domain(platform_app_36, vendor_hal_noth_camera)
+hal_client_domain(system_app, vendor_hal_noth_camera)
+
+# hal_client_domain/hal_server_domain only assign attributes; the client->server
+# binder rules have to be spelled out per HAL.
+binder_call(vendor_hal_noth_camera_client, vendor_hal_noth_camera_server)
+binder_call(vendor_hal_noth_camera_server, vendor_hal_noth_camera_client)
+allow vendor_hal_noth_camera_client vendor_hal_noth_camera_server:fd use;
+
+binder_call(hal_camera_default, cameraserver)
+binder_call(hal_camera_default, hal_camera_default)
+allow hal_camera_default fwk_camera_service:service_manager find;
+allow hal_camera_default fwk_camera_hwservice:hwservice_manager find;
+allow hal_camera_default hidl_token_hwservice:hwservice_manager find;
+
+get_prop(hal_camera_default, camera_config_prop)
+allow hal_camera_default proc_meminfo:file r_file_perms;
+
+allow hal_camera_default vendor_data_file:dir create_dir_perms;
+allow hal_camera_default vendor_data_file:file create_file_perms;
+
+# Hexagon offload for the algorithm libraries
+allow hal_camera_default adsprpcd_file:dir search;
+allow hal_camera_default vendor_xdsp_device:chr_file { ioctl read open };
+allow hal_camera_default vendor_qdsp_device:chr_file { read open };
+
+# memfd shared buffers between the algorithm service and Nothing Camera
+# processes (INtCamSession image/parameter transport).
+allow vendor_hal_noth_camera platform_app:memfd_file { read write getattr map };
+allow vendor_hal_noth_camera platform_app_36:memfd_file { read write getattr map };
+allow vendor_hal_noth_camera system_app:memfd_file { read write getattr map };
+allow platform_app vendor_hal_noth_camera:memfd_file { read write getattr map };
+allow platform_app_36 vendor_hal_noth_camera:memfd_file { read write getattr map };
+allow system_app vendor_hal_noth_camera:memfd_file { read write getattr map };
+
+# Calibration/settings files owned by the camera app data dir
+allow hal_camera_default app_data_file:file { read write getattr map };
+allow hal_camera_default vendor_camera_data_file:lnk_file { read getattr };
+
+# Suspend control used by the algorithm service while a capture pipeline runs
+wakelock_use(vendor_hal_noth_camera_server)

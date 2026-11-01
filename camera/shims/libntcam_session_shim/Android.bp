@@ -1,0 +1,31 @@
+//
+// SPDX-FileCopyrightText: Paranoid Android
+// SPDX-License-Identifier: Apache-2.0
+//
+
+// Prebuilt, no source available.
+// sha256 0f0a7e172b43f265068bd00d5c5c5142a52e8d235ce8451ea29f5d391e5323af
+//
+// Interposes hw_get_module() in vendor.qti.camera.provider-service_64 and tags
+// camera sessions opened by com.nothing.camera with the Nothing session
+// parameters CamX expects. The device tree loads it by adding it as the first
+// NEEDED of the provider (see README).
+cc_prebuilt_library_shared {
+    name: "libntcam_session_shim",
+    owner: "nothing",
+    srcs: ["libntcam_session_shim.so"],
+    strip: {
+        none: true,
+    },
+    shared_libs: [
+        "libcamera_metadata",
+        "libhardware",
+        "liblog",
+        "libc++",
+        "libc",
+        "libm",
+        "libdl",
+    ],
+    compile_multilib: "64",
+    soc_specific: true,
+}

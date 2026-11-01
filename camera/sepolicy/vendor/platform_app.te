@@ -1,0 +1,5 @@
+# Nothing Camera (platform signed, runs as platform_app_36 on Android 17)
+allow { platform_app platform_app_36 } vendor_hal_noth_camera_service:service_manager find;
+
+# DSP algorithms loaded in the app process
+allow { platform_app platform_app_36 } adsprpcd_file:dir r_dir_perms;

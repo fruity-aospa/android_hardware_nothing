@@ -1,0 +1,7 @@
+service ntcam_offlineproc /system_ext/bin/ntcam_offlineproc
+    interface aidl media.offline
+    class main
+    user cameraserver
+    group cameraserver
+    disabled
+    oneshot

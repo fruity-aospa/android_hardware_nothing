@@ -1,0 +1,8 @@
+type ntcam_offlineproc, domain, coredomain;
+type ntcam_offlineproc_exec, system_file_type, exec_type, file_type;
+
+init_daemon_domain(ntcam_offlineproc)
+
+binder_use(ntcam_offlineproc)
+binder_service(ntcam_offlineproc)
+add_service(ntcam_offlineproc, ntcam_offlineproc_service)
