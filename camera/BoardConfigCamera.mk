@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-NOTHING_CAMERA_PATH := vendor/nothing/camera
+NOTHING_CAMERA_PATH := hardware/nothing/camera
 
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
     $(NOTHING_CAMERA_PATH)/configs/framework_compatibility_matrix.xml
