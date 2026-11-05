@@ -8,7 +8,8 @@ $(call soong_config_set,camera,package_name,com.nothing.camera)
 PRODUCT_PACKAGES += \
     NTCamera \
     libntcam_client \
-    libntcam_session_shim
+    libntcam_session_shim \
+    ntcam_offlineproc
 
 PRODUCT_COPY_FILES += \
     hardware/nothing/camera/configs/init.nothing.camera.rc:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/init/init.nothing.camera.rc
