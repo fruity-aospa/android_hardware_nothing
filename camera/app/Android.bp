@@ -3,13 +3,40 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-// Kept out of the generated Android.bp so the app is AOT compiled like on
-// stock instead of starting interpreted after every update. NTCamera.apk is a
-// symlink to the extracted (Git LFS) copy under proprietary/.
+python_binary_host {
+    name: "ntcamera-device-fixup",
+    main: "patch_ntcamera.py",
+    srcs: ["patch_ntcamera.py"],
+}
+
+soong_config_module_type {
+    name: "ntcamera_device_genrule",
+    module_type: "genrule",
+    config_namespace: "nothing_camera",
+    bool_variables: ["asteroids"],
+    properties: ["cmd"],
+}
+
+ntcamera_device_genrule {
+    name: "NTCameraDeviceApk",
+    srcs: ["NTCamera.apk"],
+    tools: ["ntcamera-device-fixup"],
+    out: ["NTCamera-patched.apk"],
+    soong_config_variables: {
+        asteroids: {
+            cmd: "$(location ntcamera-device-fixup) $(in) $(out)",
+            conditions_default: {
+                cmd: "cp $(in) $(out)",
+            },
+        },
+    },
+}
+
+// The generated APK goes through the normal dexpreopt and platform-signing steps.
 android_app_import {
     name: "NTCamera",
     owner: "nothing",
-    apk: "NTCamera.apk",
+    apk: ":NTCameraDeviceApk",
     certificate: "platform",
     privileged: true,
     system_ext_specific: true,
