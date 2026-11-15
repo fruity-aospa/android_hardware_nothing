@@ -16,7 +16,12 @@ rust_binary {
         "librustutils",
         "android.hardware.light-V3-rust",
     ],
-    srcs: ["main.rs"],
+    crate_root: "main.rs",
+    srcs: [
+        "main.rs",
+        "device/phone3a/countdown-10s.bin",
+        "device/phone3a/countdown-3s.bin",
+    ],
     cfgs: select(soong_config_variable("nothing_glyph", "device"), {
         any @ device: [device],
         default: [],
