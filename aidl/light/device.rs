@@ -117,12 +117,6 @@ impl Device {
         self.controller.write(self.dir, Node::Frame, &value, levels.iter().any(|&level| level > 0))
     }
 
-    /// Draws every segment at the same level, in one write.
-    pub fn write_all(&self, level: u32) -> Result<()> {
-        let level = self.clamp(level);
-        self.controller.write(self.dir, Node::All, &level.to_string(), level > 0)
-    }
-
     /// Lights one LED on its own, outside any frame.
     pub fn write_led(&self, led: usize, level: u32) -> Result<()> {
         self.controller.write(self.dir, Node::Single, &format!("{led} {level}"), level > 0)

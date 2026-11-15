@@ -12,7 +12,6 @@ use super::{Controller, Power, State};
 
 pub static AW20036: Controller = Controller {
     frame: "frame_brightness",
-    all: "all_white_brightness",
     single: "single_brightness",
     power: Some(Power { mode: "operating_mode", retain: "always_on" }),
     state: Mutex::new(State::IDLE),

@@ -15,7 +15,7 @@ impl Fixture {
             "glyph-controller-test-{}-{}", std::process::id(), NEXT.fetch_add(1, Ordering::Relaxed),
         ));
         fs::create_dir(&dir).unwrap();
-        for node in ["frame_brightness", "all_white_brightness", "single_brightness", "operating_mode", "always_on"] {
+        for node in ["frame_brightness", "single_brightness", "operating_mode", "always_on"] {
             fs::write(dir.join(node), "").unwrap();
         }
         Self { controller: Controller::for_test(), dir }
@@ -38,10 +38,10 @@ impl Fixture {
     }
 
     fn assert_lit_retry(&self) {
-        self.write(Node::All, "128", true).unwrap();
+        self.write(Node::Frame, "128", true).unwrap();
         assert_eq!(self.read("operating_mode"), "1");
         assert_eq!(self.read("always_on"), "1");
-        assert_eq!(self.read("all_white_brightness"), "128");
+        assert_eq!(self.read("frame_brightness"), "128");
     }
 }
 
@@ -52,11 +52,11 @@ impl Drop for Fixture {
 #[test]
 fn failed_standby_still_clears_retention_and_lit_retry_rearms() {
     let fixture = Fixture::new();
-    fixture.write(Node::All, "255", true).unwrap();
+    fixture.write(Node::Frame, "255", true).unwrap();
     fixture.break_node("operating_mode");
 
     let expected = fs::write(fixture.dir.join("operating_mode"), "2").unwrap_err();
-    let actual = fixture.write(Node::All, "0", false).unwrap_err();
+    let actual = fixture.write(Node::Frame, "0", false).unwrap_err();
     assert_eq!(actual.raw_os_error(), expected.raw_os_error());
     assert_eq!(fixture.read("always_on"), "0");
 
@@ -67,11 +67,11 @@ fn failed_standby_still_clears_retention_and_lit_retry_rearms() {
 #[test]
 fn failed_retention_clear_after_standby_forces_lit_retry_to_rearm() {
     let fixture = Fixture::new();
-    fixture.write(Node::All, "255", true).unwrap();
+    fixture.write(Node::Frame, "255", true).unwrap();
     fixture.break_node("always_on");
 
     let expected = fs::write(fixture.dir.join("always_on"), "0").unwrap_err();
-    let actual = fixture.write(Node::All, "0", false).unwrap_err();
+    let actual = fixture.write(Node::Frame, "0", false).unwrap_err();
     assert_eq!(actual.raw_os_error(), expected.raw_os_error());
     assert_eq!(fixture.read("operating_mode"), "2");
 
@@ -82,7 +82,7 @@ fn failed_retention_clear_after_standby_forces_lit_retry_to_rearm() {
 #[test]
 fn failed_frame_still_clears_retention_when_standby_also_fails() {
     let fixture = Fixture::new();
-    fixture.write(Node::All, "255", true).unwrap();
+    fixture.write(Node::Frame, "255", true).unwrap();
     fixture.break_node("operating_mode");
     fs::remove_file(fixture.dir.join("frame_brightness")).unwrap();
 
@@ -97,7 +97,7 @@ fn failed_frame_still_clears_retention_when_standby_also_fails() {
 #[test]
 fn power_down_returns_first_error_when_both_cleanup_nodes_fail() {
     let fixture = Fixture::new();
-    fixture.write(Node::All, "255", true).unwrap();
+    fixture.write(Node::Frame, "255", true).unwrap();
     fixture.break_node("operating_mode");
     fs::remove_file(fixture.dir.join("always_on")).unwrap();
     std::os::unix::fs::symlink(fixture.dir.join("missing-parent/always_on"), fixture.dir.join("always_on")).unwrap();
@@ -105,7 +105,7 @@ fn power_down_returns_first_error_when_both_cleanup_nodes_fail() {
     let first = fs::write(fixture.dir.join("operating_mode"), "2").unwrap_err();
     let second = fs::write(fixture.dir.join("always_on"), "0").unwrap_err();
     assert_ne!(first.raw_os_error(), second.raw_os_error());
-    assert_eq!(fixture.write(Node::All, "0", false).unwrap_err().raw_os_error(), first.raw_os_error());
+    assert_eq!(fixture.write(Node::Frame, "0", false).unwrap_err().raw_os_error(), first.raw_os_error());
 }
 
 #[test]

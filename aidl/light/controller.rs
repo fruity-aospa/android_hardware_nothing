@@ -27,9 +27,6 @@ pub enum Node {
     /// Takes one level per segment.
     Frame,
 
-    /// Takes a single level for every segment at once.
-    All,
-
     /// Takes one LED's index and level.
     Single,
 }
@@ -58,7 +55,6 @@ impl State {
 /// A glyph controller: the names of its nodes, and what they need.
 pub struct Controller {
     frame: &'static str,
-    all: &'static str,
     single: &'static str,
 
     /// How the controller is powered, where it needs more than a write.
@@ -97,7 +93,6 @@ impl Controller {
 
         let name = match node {
             Node::Frame => self.frame,
-            Node::All => self.all,
             Node::Single => self.single,
         };
         let written = fs::OpenOptions::new().write(true).open(dir.join(name))
@@ -106,7 +101,7 @@ impl Controller {
             // A failed frame cannot leave this controller retained indefinitely.
             match node {
                 Node::Single => state.indicator = false,
-                Node::Frame | Node::All => state.strips = false,
+                Node::Frame => state.strips = false,
             }
             if !state.strips && !state.indicator {
                 if self.power(dir, false).is_ok() { state.powered = Some(false); }
@@ -119,7 +114,7 @@ impl Controller {
 
         match node {
             Node::Single => state.indicator = lit,
-            Node::Frame | Node::All => state.strips = lit,
+            Node::Frame => state.strips = lit,
         }
         if !state.strips && !state.indicator && state.powered != Some(false) {
             // Either power node can change before the other write fails.
@@ -151,7 +146,7 @@ impl Controller {
 impl Controller {
     pub(crate) fn for_test() -> &'static Controller {
         Box::leak(Box::new(Controller {
-            frame: "frame_brightness", all: "all_white_brightness", single: "single_brightness",
+            frame: "frame_brightness", single: "single_brightness",
             power: Some(Power { mode: "operating_mode", retain: "always_on" }),
             state: Mutex::new(State::IDLE), history: Mutex::new(Vec::new()),
             coalesce_window: Duration::from_millis(2), min_update_period_millis: 16,

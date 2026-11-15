@@ -12,7 +12,6 @@ use super::{Controller, State};
 
 pub static AW210XX: Controller = Controller {
     frame: "frame_leds_effect",
-    all: "all_white_leds_br",
     single: "single_led_br",
     power: None,
     state: Mutex::new(State::IDLE),
