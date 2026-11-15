@@ -13,22 +13,29 @@ import zlib
 
 # shortcut: pinned C5.0 bytecode, refresh this patch when the camera APK changes.
 DEX_SHA256 = "918b89f7e941cd9d467c130b2ff1db15a4953e0ef66ba6d6bd2dbb5d1713bfbb"
-PATCHED_DEX_SHA256 = "2b3941a6f789574047f1c2e1ac08040e8d742fef4149e0930c442a8e72906547"
+PATCHED_DEX_SHA256 = "89bf972c5aab8effc905912a8e9603a30b7d4f18f52c8a44d04b31fa609d45a6"
 PATCH_OFFSET = 2182962
 ORIGINAL = bytes.fromhex("7120592925000c05")
 # ProductConfig.<clinit>: use the existing "Asteroids" string instead of ro.product.device.
 REPLACEMENT = bytes.fromhex("1a058a1300000000")
+# FeatureConfigParser.initPropertyValue: keep ConfigMapAsteroids[Plus] selection.
+FEATURE_OFFSET = 2145474
+FEATURE_ORIGINAL = bytes.fromhex("7120592932000c02")
+FEATURE_REPLACEMENT = bytes.fromhex("1a028a1300000000")
 
 
 def patch_dex(data):
     digest = hashlib.sha256(data).hexdigest()
     if digest == PATCHED_DEX_SHA256:
         return data
-    if digest != DEX_SHA256 or data[PATCH_OFFSET:PATCH_OFFSET + 8] != ORIGINAL:
+    if (digest != DEX_SHA256
+            or data[PATCH_OFFSET:PATCH_OFFSET + 8] != ORIGINAL
+            or data[FEATURE_OFFSET:FEATURE_OFFSET + 8] != FEATURE_ORIGINAL):
         raise ValueError("NTCamera bytecode changed; refresh the Asteroids device patch")
 
     patched = bytearray(data)
     patched[PATCH_OFFSET:PATCH_OFFSET + 8] = REPLACEMENT
+    patched[FEATURE_OFFSET:FEATURE_OFFSET + 8] = FEATURE_REPLACEMENT
     patched[12:32] = hashlib.sha1(patched[32:]).digest()
     struct.pack_into("<I", patched, 8, zlib.adler32(patched[12:]) & 0xffffffff)
     if hashlib.sha256(patched).hexdigest() != PATCHED_DEX_SHA256:
