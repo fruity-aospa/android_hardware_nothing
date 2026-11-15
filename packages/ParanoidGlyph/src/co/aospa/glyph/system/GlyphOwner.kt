@@ -25,6 +25,8 @@ internal enum class GlyphOwner {
     /** The streams, in the order of [GlyphStream]. */
     CLIENT,
     VISUALIZER,
+    PROGRESS,
+    MEDIA_PROGRESS,
 }
 
 /** The owner a stream claims the strips as. */
@@ -33,4 +35,6 @@ internal val GlyphStream.owner: GlyphOwner
         when (this) {
             GlyphStream.CLIENT -> GlyphOwner.CLIENT
             GlyphStream.VISUALIZER -> GlyphOwner.VISUALIZER
+            GlyphStream.PROGRESS -> GlyphOwner.PROGRESS
+            GlyphStream.MEDIA_PROGRESS -> GlyphOwner.MEDIA_PROGRESS
         }

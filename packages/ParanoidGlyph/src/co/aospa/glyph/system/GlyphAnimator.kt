@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.roundToInt
 
 /**
  * Plays everything that lights the strips, one owner at a time.
@@ -130,16 +131,41 @@ class GlyphAnimator(
     }
 
     /** Plays a csv animation once. */
-    fun playCsv(name: String) = post {
-        startPlayback(GlyphOwner.EVENT, name) { animations.read(name).toFrames(name) }
+    fun playCsv(name: String, reversed: Boolean = false) = post {
+        startPlayback(GlyphOwner.EVENT, name) {
+            animations.read(name).toFrames(name).let { if (reversed) it.reversed() else it }
+        }
     }
 
     /** Rings until [stopCall], as the call does. */
-    fun playCall(name: String) = post {
+    fun playCall(name: String, reversed: Boolean = false, useSynced: Boolean = true) = post {
         startPlayback(GlyphOwner.CALL, name, iterations = 0) {
-            animations.readCall(name).toFrames(name)
+            animations.readCall(name, useSynced).toFrames(name).let { if (reversed) it.reversed() else it }
         }
     }
+
+    fun playNotification(name: String, reversed: Boolean = false, useSynced: Boolean = true) = post {
+        startPlayback(GlyphOwner.EVENT, name) {
+            animations.readNotification(name, useSynced).toFrames(name)
+                .let { if (reversed) it.reversed() else it }
+        }
+    }
+
+    /** Holds progress on the volume strip, below calls, events and other streams. */
+    fun setProgress(percent: Int, media: Boolean = false) = post {
+        val count = lights.size(Group.VOLUME)
+        if (count == 0) return@post
+        val filled = (percent.coerceIn(0, 100) * count / 100f).roundToInt()
+        val stream = if (media) GlyphStream.MEDIA_PROGRESS else GlyphStream.PROGRESS
+        claims[stream.owner] = StreamFrame(
+            FloatArray(count) { if (it < filled) config.maxBrightness.toFloat() else 0f },
+            Group.VOLUME,
+        )
+        render()
+    }
+
+    fun endProgress(media: Boolean = false) =
+        endFrames(if (media) GlyphStream.MEDIA_PROGRESS else GlyphStream.PROGRESS)
 
     /** Stops the ringing. */
     fun stopCall() = post {
@@ -299,14 +325,14 @@ class GlyphAnimator(
             // The all-glyphs light first, or its cached color skips the next torch.
             AllGlyphs -> lights.setAll(0f)
             is Playback -> if (next?.fills(previous.group) != true) clear(previous.group)
-            is StreamFrame -> if (!next.fillsGlyphs()) clear(Group.GLYPHS)
+            is StreamFrame -> if (next?.fills(previous.group) != true) clear(previous.group)
         }
     }
 
     private fun draw(content: GlyphContent) {
         when (content) {
             AllGlyphs -> lights.setAll(brightness.toFloat())
-            is StreamFrame -> lights.setFrame(Group.GLYPHS, scaled(content.levels))
+            is StreamFrame -> lights.setFrame(content.group, scaled(content.levels, content.group))
             is Playback -> {
                 val frames = content.framesFromNow()
                 if (frames.isNotEmpty()) {

@@ -12,4 +12,10 @@ enum class GlyphStream {
 
     /** The music visualizer. */
     VISUALIZER,
+
+    /** Notification progress, while no higher-priority output is active. */
+    PROGRESS,
+
+    /** Media progress, while notification progress is not active. */
+    MEDIA_PROGRESS,
 }

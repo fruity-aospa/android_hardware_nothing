@@ -7,6 +7,7 @@ package co.aospa.glyph.data.source
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.media.AudioManager
 import android.provider.Settings
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
@@ -22,7 +23,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 /** The user's glyph settings. */
-class GlyphPreferences(context: Context, private val config: GlyphConfig) {
+class GlyphPreferences(private val context: Context, private val config: GlyphConfig) {
     companion object {
         const val KEY_ENABLED = "glyph_enable"
         const val KEY_BRIGHTNESS = "glyph_settings_brightness"
@@ -50,6 +51,17 @@ class GlyphPreferences(context: Context, private val config: GlyphConfig) {
         const val KEY_DND_SYNC = "glyph_schedule_dnd_sync"
         const val KEY_BATTERY_SAVER_SYNC = "glyph_schedule_battery_saver_sync"
         const val KEY_MUSIC_VISUALIZER = "glyph_settings_music_visualizer_toggle"
+        const val KEY_CALL_REVERSE = "glyph_settings_call_sub_animations_reverse_toggle"
+        const val KEY_NOTIFICATIONS_REVERSE = "glyph_settings_notifs_sub_animations_reverse_toggle"
+        const val KEY_CALL_TONE_SYNC = "glyph_settings_call_ogg_sync_toggle"
+        const val KEY_NOTIFICATIONS_TONE_SYNC = "glyph_settings_notifs_ogg_sync_toggle"
+        const val KEY_FLIP_ANIMATION = "glyph_settings_flip_sub_animation_toggle"
+        const val KEY_FLIP_RINGER_MODE = "glyph_settings_flip_sub_ringer_mode"
+        const val KEY_PROGRESS = "glyph_settings_progress_toggle"
+        const val KEY_MEDIA_PROGRESS = "glyph_settings_progress_media_toggle"
+        const val KEY_MEDIA_PROGRESS_APPS = "glyph_settings_progress_media_app_whitelist"
+        const val KEY_MIC_ACTIVITY = "glyph_settings_mic_activity_toggle"
+        const val KEY_MIC_APPS = "glyph_settings_mic_activity_whitelist"
 
         /** Where the slider starts, of the levels the device offers. */
         private const val DEFAULT_BRIGHTNESS_STEP = 3
@@ -90,6 +102,19 @@ class GlyphPreferences(context: Context, private val config: GlyphConfig) {
                     }
                 }
                 putBoolean("glyph_v2_storage_migrated", true)
+            }
+        }
+        if (!preferences.getBoolean("glyph_v2_custom_storage_migrated", false)) {
+            preferences.edit {
+                for ((old, current) in listOf(
+                    "glyph_settings_auto_brightness_toggle" to KEY_AUTO_BRIGHTNESS,
+                    "glyph_settings_battery_saver_toggle" to KEY_BATTERY_SAVER_SYNC,
+                )) {
+                    if (!preferences.contains(current) && preferences.contains(old)) {
+                        putBoolean(current, preferences.getBoolean(old, false))
+                    }
+                }
+                putBoolean("glyph_v2_custom_storage_migrated", true)
             }
         }
     }
@@ -191,6 +216,30 @@ class GlyphPreferences(context: Context, private val config: GlyphConfig) {
     val callAnimation: String
         get() = preferences.getString(KEY_CALL_ANIMATION, defaultCall) ?: defaultCall
 
+    val isCallAnimationReversed: Boolean
+        get() = preferences.getBoolean(KEY_CALL_REVERSE, false)
+
+    val isCallToneSyncEnabled: Boolean
+        get() = isCallEnabled && preferences.getBoolean(KEY_CALL_TONE_SYNC, true)
+
+    /** The old files remain the source of app/contact overrides, preserving their saved choices. */
+    fun callPreferences(packageName: String) =
+        context.getSharedPreferences("call_$packageName", Context.MODE_PRIVATE)
+
+    fun contactPreferences(contactId: Long) =
+        context.getSharedPreferences("call_contact_$contactId", Context.MODE_PRIVATE)
+
+    fun hasCallOverride(settings: SharedPreferences) = settings.all.isNotEmpty()
+
+    fun callAnimation(settings: SharedPreferences): String =
+        settings.getString(KEY_CALL_ANIMATION, defaultCall) ?: defaultCall
+
+    fun isCallAnimationReversed(settings: SharedPreferences) =
+        settings.getBoolean(KEY_CALL_REVERSE, false)
+
+    fun isCallAllowed(settings: SharedPreferences) =
+        settings.getBoolean(KEY_CALL, true)
+
     /** Whether music drives the glyphs. */
     var isMusicVisualizerEnabled: Boolean
         get() = isFeatureEnabled(KEY_MUSIC_VISUALIZER)
@@ -211,8 +260,35 @@ class GlyphPreferences(context: Context, private val config: GlyphConfig) {
             preferences.getString(KEY_NOTIFICATIONS_ANIMATION, defaultNotification)
                 ?: defaultNotification
 
+    val isNotificationAnimationReversed: Boolean
+        get() = preferences.getBoolean(KEY_NOTIFICATIONS_REVERSE, false)
+
+    val areNotificationTonesSynced: Boolean
+        get() = areNotificationsEnabled && preferences.getBoolean(KEY_NOTIFICATIONS_TONE_SYNC, true)
+
+    fun notificationPreferences(packageName: String) =
+        context.getSharedPreferences("notif_$packageName", Context.MODE_PRIVATE)
+
+    fun hasNotificationAnimationOverride(packageName: String): Boolean {
+        val settings = notificationPreferences(packageName)
+        return settings.contains(KEY_NOTIFICATIONS_ANIMATION) || settings.contains(KEY_NOTIFICATIONS_REVERSE)
+    }
+
+    fun notificationAnimation(packageName: String): String =
+        if (hasNotificationAnimationOverride(packageName)) {
+            notificationPreferences(packageName).getString(KEY_NOTIFICATIONS_ANIMATION, defaultNotification)
+                ?: defaultNotification
+        } else notificationAnimation
+
+    fun isNotificationAnimationReversed(packageName: String) =
+        if (hasNotificationAnimationOverride(packageName)) {
+            notificationPreferences(packageName).getBoolean(KEY_NOTIFICATIONS_REVERSE, false)
+        } else isNotificationAnimationReversed
+
     /** Whether the user left an app's notifications switched on. */
-    fun isAppAllowed(packageName: String): Boolean = preferences.getBoolean(packageName, true)
+    fun isAppAllowed(packageName: String): Boolean =
+        preferences.getBoolean(packageName,
+            notificationPreferences(packageName).getBoolean(KEY_NOTIFICATIONS_SWITCH, true))
 
     /** Lets an app's notifications reach the strips, or stops them. */
     fun setAppAllowed(packageName: String, allowed: Boolean) =
@@ -235,6 +311,29 @@ class GlyphPreferences(context: Context, private val config: GlyphConfig) {
         val apps = if (essential) essentialApps + packageName else essentialApps - packageName
         preferences.edit { putStringSet(KEY_ESSENTIAL_APPS, apps) }
     }
+
+    val isFlipAnimationEnabled: Boolean
+        get() = preferences.getBoolean(KEY_FLIP_ANIMATION, true)
+
+    val flipRingerMode: Int
+        get() = preferences.getString(KEY_FLIP_RINGER_MODE, "${AudioManager.RINGER_MODE_VIBRATE}")
+            ?.toIntOrNull()?.takeIf { it in AudioManager.RINGER_MODE_SILENT..AudioManager.RINGER_MODE_NORMAL }
+            ?: AudioManager.RINGER_MODE_VIBRATE
+
+    val isProgressEnabled: Boolean
+        get() = isFeatureEnabled(KEY_PROGRESS)
+
+    val isMediaProgressEnabled: Boolean
+        get() = isProgressEnabled && preferences.getBoolean(KEY_MEDIA_PROGRESS, false)
+
+    val mediaProgressApps: Set<String>
+        get() = preferences.getStringSet(KEY_MEDIA_PROGRESS_APPS, emptySet()).orEmpty()
+
+    val isMicActivityEnabled: Boolean
+        get() = isFeatureEnabled(KEY_MIC_ACTIVITY)
+
+    val microphoneApps: Set<String>
+        get() = preferences.getStringSet(KEY_MIC_APPS, emptySet()).orEmpty()
 
     /** Whether the user chose the feature with [key], whether or not the strips are used. */
     fun isFeatureChosen(key: String, default: Boolean) = preferences.getBoolean(key, default)

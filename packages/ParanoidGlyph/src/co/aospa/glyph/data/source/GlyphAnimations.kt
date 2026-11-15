@@ -27,11 +27,11 @@ class GlyphAnimations(context: Context) {
     val notifications: Array<String> by lazy { list("notification") }
 
     /** Reads a ringtone, falling back to the default. */
-    fun readCall(name: String): List<List<String>> =
+    fun readCall(name: String, useSynced: Boolean = true): List<List<String>> =
         readAsset("call/${if (name in calls) name else defaultCall}.csv")
 
     /** Reads a notification animation, falling back to the default. */
-    fun readNotification(name: String): List<List<String>> =
+    fun readNotification(name: String, useSynced: Boolean = true): List<List<String>> =
         readAsset("notification/${if (name in notifications) name else defaultNotification}.csv")
 
     /** Reads an animation by name, wherever it lives. */

@@ -20,8 +20,8 @@ internal sealed interface GlyphContent {
     }
 
     /** The frame a stream last sent, held until its next. */
-    class StreamFrame(val levels: FloatArray) : GlyphContent {
-        override fun fills(group: Group) = group == Group.GLYPHS
+    class StreamFrame(val levels: FloatArray, val group: Group = Group.GLYPHS) : GlyphContent {
+        override fun fills(group: Group) = group == this.group
     }
 
     /**
