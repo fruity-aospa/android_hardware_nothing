@@ -55,6 +55,7 @@ class GlyphPreferences(private val context: Context, private val config: GlyphCo
         const val KEY_NOTIFICATIONS_REVERSE = "glyph_settings_notifs_sub_animations_reverse_toggle"
         const val KEY_CALL_TONE_SYNC = "glyph_settings_call_ogg_sync_toggle"
         const val KEY_NOTIFICATIONS_TONE_SYNC = "glyph_settings_notifs_ogg_sync_toggle"
+        const val KEY_NOTIFICATIONS_SILENT = "glyph_settings_notifs_silent_toggle"
         const val KEY_FLIP_ANIMATION = "glyph_settings_flip_sub_animation_toggle"
         const val KEY_FLIP_RINGER_MODE = "glyph_settings_flip_sub_ringer_mode"
         const val KEY_PROGRESS = "glyph_settings_progress_toggle"
@@ -265,6 +266,9 @@ class GlyphPreferences(private val context: Context, private val config: GlyphCo
 
     val areNotificationTonesSynced: Boolean
         get() = areNotificationsEnabled && preferences.getBoolean(KEY_NOTIFICATIONS_TONE_SYNC, true)
+
+    val areSilentNotificationsEnabled: Boolean
+        get() = areNotificationsEnabled && preferences.getBoolean(KEY_NOTIFICATIONS_SILENT, true)
 
     fun notificationPreferences(packageName: String) =
         context.getSharedPreferences("notif_$packageName", Context.MODE_PRIVATE)

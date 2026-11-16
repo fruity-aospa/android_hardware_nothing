@@ -144,6 +144,14 @@ class GlyphAnimator(
         }
     }
 
+    /** Plays the current call animation once from its settings screen. */
+    fun previewCall(name: String, reversed: Boolean = false, useSynced: Boolean = true) = post {
+        startPlayback(GlyphOwner.EVENT, name) {
+            animations.readCall(name, useSynced).toFrames(name)
+                .let { if (reversed) it.reversed() else it }
+        }
+    }
+
     fun playNotification(name: String, reversed: Boolean = false, useSynced: Boolean = true) = post {
         startPlayback(GlyphOwner.EVENT, name) {
             animations.readNotification(name, useSynced).toFrames(name)

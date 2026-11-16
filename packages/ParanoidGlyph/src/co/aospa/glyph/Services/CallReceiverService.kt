@@ -61,7 +61,11 @@ class CallReceiverService : FeatureService(TAG) {
 
                 // The glyphs ring for as long as this block does, and stop when it is canceled.
                 try {
-                    glyph.animator.playCall(glyph.preferences.callAnimation)
+                    glyph.animator.playCall(
+                        glyph.preferences.callAnimation,
+                        glyph.preferences.isCallAnimationReversed,
+                        glyph.preferences.isCallToneSyncEnabled,
+                    )
                     awaitCancellation()
                 } finally {
                     glyph.animator.stopCall()

@@ -25,7 +25,7 @@ class GlyphApplication : Application() {
     val preferences by lazy { GlyphPreferences(this, config) }
 
     /** The csv animations. */
-    val animations by lazy { GlyphAnimations(this) }
+    val animations by lazy { GlyphAnimations(this, config) }
 
     /** The strips. */
     val lights by lazy { GlyphLights(this, config) }

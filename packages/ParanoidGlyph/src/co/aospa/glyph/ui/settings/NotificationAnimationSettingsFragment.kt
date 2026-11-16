@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import androidx.preference.SwitchPreferenceCompat
 import co.aospa.glyph.R
 import co.aospa.glyph.data.source.GlyphPreferences
 import co.aospa.glyph.ui.preference.GlyphAnimationPreference
@@ -46,6 +47,7 @@ class NotificationAnimationSettingsFragment : SettingsBasePreferenceFragment() {
                         enabled,
                         preferences.notificationAnimation,
                         PREVIEW_PAUSE,
+                        preferences.isNotificationAnimationReversed,
                     )
                 }
                 isAllowed
@@ -63,13 +65,32 @@ class NotificationAnimationSettingsFragment : SettingsBasePreferenceFragment() {
                     preferences.areNotificationsEnabled,
                     animation.toString(),
                     PREVIEW_PAUSE,
+                    preferences.isNotificationAnimationReversed,
+                )
+                true
+            }
+        }
+
+        findPreference<SwitchPreferenceCompat>(GlyphPreferences.KEY_NOTIFICATIONS_REVERSE)?.apply {
+            setOnPreferenceChangeListener { _, reversed ->
+                preview?.updateAnimation(
+                    preferences.areNotificationsEnabled,
+                    preferences.notificationAnimation,
+                    PREVIEW_PAUSE,
+                    reversed as Boolean,
                 )
                 true
             }
         }
 
         findPreference<ButtonPreference>(GlyphPreferences.KEY_NOTIFICATIONS_PLAY)?.apply {
-            setOnClickListener { glyph.animator.playCsv(preferences.notificationAnimation) }
+            setOnClickListener {
+                glyph.animator.playNotification(
+                    preferences.notificationAnimation,
+                    preferences.isNotificationAnimationReversed,
+                    preferences.areNotificationTonesSynced,
+                )
+            }
         }
 
         findPreference<Preference>(GlyphPreferences.KEY_ESSENTIAL_APPS)?.apply {
@@ -85,6 +106,7 @@ class NotificationAnimationSettingsFragment : SettingsBasePreferenceFragment() {
             preferences.areNotificationsEnabled,
             preferences.notificationAnimation,
             PREVIEW_PAUSE,
+            preferences.isNotificationAnimationReversed,
         )
     }
 }

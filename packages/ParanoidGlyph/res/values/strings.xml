@@ -45,8 +45,16 @@
     <string name="pref_call_animation_enable_title">Enable call animation</string>
     <!-- Call screen item: which animation to ring with. [CHAR LIMIT=48] -->
     <string name="pref_call_animation_pattern_title">Call pattern</string>
+    <!-- Call screen setting: use Glyph data embedded in the selected ringtone. [CHAR LIMIT=48] -->
+    <string name="pref_call_tone_sync_title">Sync with ringtone</string>
+    <!-- Call screen summary for ringtone Glyph data. [CHAR LIMIT=NONE] -->
+    <string name="pref_call_tone_sync_summary">Use the ringtone’s Glyph animation when available</string>
     <!-- Animation screens category: which animation to use, and trying it. [CHAR LIMIT=32] -->
     <string name="pref_category_animation">Animation</string>
+    <!-- Animation screens setting: play the chosen pattern backwards. [CHAR LIMIT=48] -->
+    <string name="pref_animation_reverse_title">Reverse animation</string>
+    <!-- Animation screens summary for reverse playback. [CHAR LIMIT=NONE] -->
+    <string name="pref_animation_reverse_summary">Play the animation from end to beginning</string>
     <!-- Animation screens button: plays the chosen animation on the glyphs once. [CHAR LIMIT=48] -->
     <string name="pref_animation_play_title">Play on Glyph</string>
     <!-- Notification screen category: which apps may light the glyphs. [CHAR LIMIT=32] -->
@@ -60,6 +68,14 @@
     <string name="pref_notification_animation_enable_title">Enable notification animation</string>
     <!-- Notification screen item: which animation to play. [CHAR LIMIT=48] -->
     <string name="pref_notification_animation_pattern_title">Notification pattern</string>
+    <!-- Notification screen setting: use Glyph data embedded in the selected sound. [CHAR LIMIT=48] -->
+    <string name="pref_notification_tone_sync_title">Sync with notification sound</string>
+    <!-- Notification screen summary for sound Glyph data. [CHAR LIMIT=NONE] -->
+    <string name="pref_notification_tone_sync_summary">Use the notification sound’s Glyph animation when available</string>
+    <!-- Notification screen setting: whether quiet channels light the Glyphs. [CHAR LIMIT=48] -->
+    <string name="pref_notification_silent_title">Light silent notifications</string>
+    <!-- Notification screen summary for quiet channels. [CHAR LIMIT=NONE] -->
+    <string name="pref_notification_silent_summary">Play Glyph animations for silent and minimized notifications</string>
     <!-- Notification screen item: opens the list of apps that may light the strips. [CHAR LIMIT=48] -->
     <string name="pref_allowed_apps_title">Apps to allow</string>
     <!-- Settings item summary for the list of apps that may light the strips. [CHAR LIMIT=NONE] -->
@@ -92,6 +108,10 @@
     <string name="pref_volume_indicator_title">Volume indicator</string>
     <!-- Settings item summary for the volume indicator. [CHAR LIMIT=NONE] -->
     <string name="pref_volume_indicator_summary">Audio level at a glance</string>
+    <!-- Settings item: show determinate notification progress on the volume strip. [CHAR LIMIT=48] -->
+    <string name="pref_notification_progress_title">Notification progress</string>
+    <!-- Settings item summary for determinate notification progress. [CHAR LIMIT=NONE] -->
+    <string name="pref_notification_progress_summary">Show download and other notification progress on the Glyph strip</string>
     <!-- Volume screen footer: what the feature does. [CHAR LIMIT=NONE] -->
     <string name="volume_indicator_footer">Display the current volume level with the Glyph Interface when adjusting.</string>
 

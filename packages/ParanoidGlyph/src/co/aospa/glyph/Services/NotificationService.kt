@@ -5,6 +5,7 @@
 
 package co.aospa.glyph.Services
 
+import android.app.Notification
 import android.app.NotificationManager
 import android.service.notification.NotificationListenerService
 import android.service.notification.NotificationListenerService.Ranking
@@ -39,6 +40,8 @@ class NotificationService : NotificationListenerService() {
             setOf(
                 GlyphPreferences.KEY_ESSENTIAL_APPS,
                 GlyphPreferences.KEY_NOTIFICATIONS,
+                GlyphPreferences.KEY_NOTIFICATIONS_SILENT,
+                GlyphPreferences.KEY_PROGRESS,
                 GlyphPreferences.KEY_ENABLED,
             )
     }
@@ -55,6 +58,9 @@ class NotificationService : NotificationListenerService() {
     /** Whether the system has connected the listener, before which notifications cannot be read. */
     private var isConnected = false
 
+    /** Determinate notification progress, newest update last. */
+    private val progressNotifications = linkedMapOf<String, Int>()
+
     override fun onCreate() {
         GlyphLog.d(TAG) { "Notifications watched" }
         super.onCreate()
@@ -64,6 +70,7 @@ class NotificationService : NotificationListenerService() {
             .onEach { key ->
                 GlyphLog.d(TAG) { "$key changed" }
                 holdEssential()
+                syncProgress()
             }
             .launchIn(scope)
 
@@ -75,11 +82,14 @@ class NotificationService : NotificationListenerService() {
         super.onListenerConnected()
         isConnected = true
         holdEssential()
+        syncProgress()
     }
 
     override fun onListenerDisconnected() {
         isConnected = false
         animator.stopEssential()
+        progressNotifications.clear()
+        animator.endProgress()
         super.onListenerDisconnected()
     }
 
@@ -87,17 +97,26 @@ class NotificationService : NotificationListenerService() {
         GlyphLog.d(TAG) { "Notifications no longer watched" }
         scope.cancel()
         animator.stopEssential()
+        progressNotifications.clear()
+        animator.endProgress()
         super.onDestroy()
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification, rankingMap: RankingMap) {
+        updateProgress(sbn)
+
         if (!preferences.areNotificationsEnabled || !sbn.isWanted(rankingMap)) {
             return
         }
 
         if (preferences.isAppEnabled(sbn.packageName)) {
             wakeLock.acquireForAnimation()
-            animator.playCsv(preferences.notificationAnimation)
+            val hasOverride = preferences.hasNotificationAnimationOverride(sbn.packageName)
+            animator.playNotification(
+                preferences.notificationAnimation(sbn.packageName),
+                preferences.isNotificationAnimationReversed(sbn.packageName),
+                preferences.areNotificationTonesSynced && !hasOverride,
+            )
         }
 
         if (
@@ -108,9 +127,48 @@ class NotificationService : NotificationListenerService() {
         }
     }
 
-    override fun onNotificationRemoved(sbn: StatusBarNotification) = holdEssential()
+    override fun onNotificationRemoved(sbn: StatusBarNotification) {
+        progressNotifications.remove(sbn.key)
+        showProgress()
+        holdEssential()
+    }
 
     override fun onNotificationRankingUpdate(rankingMap: RankingMap) = holdEssential(rankingMap)
+
+    /** Rebuilds progress after connecting or changing its setting. */
+    private fun syncProgress() {
+        progressNotifications.clear()
+        if (isConnected && preferences.isProgressEnabled) {
+            activeNotifications.orEmpty().forEach { sbn ->
+                sbn.progressPercent()?.let { progressNotifications[sbn.key] = it }
+            }
+        }
+        showProgress()
+    }
+
+    /** Adds, updates, or removes one determinate progress notification. */
+    private fun updateProgress(sbn: StatusBarNotification) {
+        progressNotifications.remove(sbn.key)
+        if (preferences.isProgressEnabled) {
+            sbn.progressPercent()?.let { progressNotifications[sbn.key] = it }
+        }
+        showProgress()
+    }
+
+    private fun showProgress() {
+        val percent = progressNotifications.values.lastOrNull()
+        if (percent == null) animator.endProgress() else animator.setProgress(percent)
+    }
+
+    private fun StatusBarNotification.progressPercent(): Int? {
+        val extras = notification.extras ?: return null
+        if (extras.getBoolean(Notification.EXTRA_PROGRESS_INDETERMINATE, false)) return null
+
+        val progress = extras.getInt(Notification.EXTRA_PROGRESS, -1)
+        val maximum = extras.getInt(Notification.EXTRA_PROGRESS_MAX, -1)
+        if (progress < 0 || maximum <= 0) return null
+        return ((progress.coerceAtMost(maximum).toLong() * 100L) / maximum).toInt()
+    }
 
     /** Holds a glyph lit for as long as an essential notification stands. */
     private fun holdEssential(rankingMap: RankingMap? = null) {
@@ -152,8 +210,11 @@ class NotificationService : NotificationListenerService() {
             "$packageName:$channelId importance $importance, bypasses dnd $canBypassDnd"
         }
 
-        // Silent channels are still visible notifications; only fully blocked channels are ignored.
-        val isVisible = importance == null || importance > NotificationManager.IMPORTANCE_NONE
+        val isVisible =
+            importance == null ||
+                importance >= NotificationManager.IMPORTANCE_DEFAULT ||
+                (preferences.areSilentNotificationsEnabled &&
+                    importance > NotificationManager.IMPORTANCE_NONE)
         val isAllowed =
             notificationManager.currentInterruptionFilter <=
                 NotificationManager.INTERRUPTION_FILTER_ALL || canBypassDnd

@@ -46,7 +46,12 @@ class GlyphAnimationPreference(context: Context, attrs: AttributeSet?) :
     }
 
     /** What the drawing is asked to show: an animation, played again after a pause, or nothing. */
-    private data class Request(val name: String?, val shouldPlay: Boolean, val pause: Duration)
+    private data class Request(
+        val name: String?,
+        val shouldPlay: Boolean,
+        val pause: Duration,
+        val reversed: Boolean,
+    )
 
     private val config = context.glyph.config
     private val animations = context.glyph.animations
@@ -66,7 +71,9 @@ class GlyphAnimationPreference(context: Context, attrs: AttributeSet?) :
     }
 
     private val request =
-        MutableStateFlow(Request(name = null, shouldPlay = false, pause = Duration.ZERO))
+        MutableStateFlow(
+            Request(name = null, shouldPlay = false, pause = Duration.ZERO, reversed = false)
+        )
 
     /** Lasts while the preference is on screen, which is the only time it is drawn. */
     private var scope: CoroutineScope? = null
@@ -122,8 +129,9 @@ class GlyphAnimationPreference(context: Context, attrs: AttributeSet?) :
         shouldPlay: Boolean,
         name: String? = request.value.name,
         pauseBetween: Duration = Duration.ZERO,
+        reversed: Boolean = request.value.reversed,
     ) {
-        request.value = Request(name, shouldPlay, pauseBetween)
+        request.value = Request(name, shouldPlay, pauseBetween, reversed)
     }
 
     private suspend fun show(target: Request) {
@@ -137,7 +145,11 @@ class GlyphAnimationPreference(context: Context, attrs: AttributeSet?) :
 
         val frames =
             try {
-                withContext(Dispatchers.IO) { animations.read(name).map(config::frameOf) }
+                withContext(Dispatchers.IO) {
+                    animations.read(name).map(config::frameOf).let {
+                        if (target.reversed) it.reversed() else it
+                    }
+                }
             } catch (e: IOException) {
                 Log.w(TAG, "Could not show $name: $e")
                 draw(null)

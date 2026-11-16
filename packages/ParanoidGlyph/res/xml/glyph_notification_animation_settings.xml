@@ -28,6 +28,27 @@
             android:summary="%s"
             android:title="@string/pref_notification_animation_pattern_title" />
 
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="glyph_settings_notifs_sub_toggle"
+            android:key="glyph_settings_notifs_ogg_sync_toggle"
+            android:summary="@string/pref_notification_tone_sync_summary"
+            android:title="@string/pref_notification_tone_sync_title" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:dependency="glyph_settings_notifs_sub_toggle"
+            android:key="glyph_settings_notifs_sub_animations_reverse_toggle"
+            android:summary="@string/pref_animation_reverse_summary"
+            android:title="@string/pref_animation_reverse_title" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="glyph_settings_notifs_sub_toggle"
+            android:key="glyph_settings_notifs_silent_toggle"
+            android:summary="@string/pref_notification_silent_summary"
+            android:title="@string/pref_notification_silent_title" />
+
         <com.android.settingslib.widget.ButtonPreference
             android:dependency="glyph_settings_notifs_sub_toggle"
             android:icon="@drawable/ic_play_arrow_24dp"

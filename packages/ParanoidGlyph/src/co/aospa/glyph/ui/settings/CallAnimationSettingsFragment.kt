@@ -8,6 +8,7 @@ package co.aospa.glyph.ui.settings
 import android.os.Bundle
 import android.view.View
 import androidx.preference.ListPreference
+import androidx.preference.SwitchPreferenceCompat
 import co.aospa.glyph.R
 import co.aospa.glyph.data.source.GlyphPreferences
 import co.aospa.glyph.ui.preference.GlyphAnimationPreference
@@ -32,7 +33,7 @@ class CallAnimationSettingsFragment : SettingsBasePreferenceFragment() {
             setOnPreferenceChangeListener { _, checked ->
                 val enabled = checked as Boolean
                 preferences.isCallEnabled = enabled
-                preview?.updateAnimation(enabled, preferences.callAnimation)
+                updatePreview(enabled)
                 true
             }
         }
@@ -44,13 +45,34 @@ class CallAnimationSettingsFragment : SettingsBasePreferenceFragment() {
                 value = preferences.callAnimation
             }
             setOnPreferenceChangeListener { _, animation ->
-                preview?.updateAnimation(preferences.isCallEnabled, animation.toString())
+                preview?.updateAnimation(
+                    preferences.isCallEnabled,
+                    animation.toString(),
+                    reversed = preferences.isCallAnimationReversed,
+                )
+                true
+            }
+        }
+
+        findPreference<SwitchPreferenceCompat>(GlyphPreferences.KEY_CALL_REVERSE)?.apply {
+            setOnPreferenceChangeListener { _, reversed ->
+                preview?.updateAnimation(
+                    preferences.isCallEnabled,
+                    preferences.callAnimation,
+                    reversed = reversed as Boolean,
+                )
                 true
             }
         }
 
         findPreference<ButtonPreference>(GlyphPreferences.KEY_CALL_PLAY)?.apply {
-            setOnClickListener { glyph.animator.playCsv(preferences.callAnimation) }
+            setOnClickListener {
+                glyph.animator.previewCall(
+                    preferences.callAnimation,
+                    preferences.isCallAnimationReversed,
+                    preferences.isCallToneSyncEnabled,
+                )
+            }
         }
 
         preview = findPreference(GlyphPreferences.KEY_CALL_PREVIEW)
@@ -58,6 +80,14 @@ class CallAnimationSettingsFragment : SettingsBasePreferenceFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        preview?.updateAnimation(preferences.isCallEnabled, preferences.callAnimation)
+        updatePreview()
+    }
+
+    private fun updatePreview(enabled: Boolean = preferences.isCallEnabled) {
+        preview?.updateAnimation(
+            enabled,
+            preferences.callAnimation,
+            reversed = preferences.isCallAnimationReversed,
+        )
     }
 }
