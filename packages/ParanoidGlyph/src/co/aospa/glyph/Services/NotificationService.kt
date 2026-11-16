@@ -143,19 +143,21 @@ class NotificationService : NotificationListenerService() {
 
         // Ranking carries the posted notification's user and conversation channel.
         val ranking = Ranking()
-        val channel = if (rankingMap?.getRanking(key, ranking) == true) ranking.channel else null
-        val importance = channel?.importance
+        val hasRanking = rankingMap?.getRanking(key, ranking) == true
+        val channel = if (hasRanking) ranking.channel else null
+        val importance = if (hasRanking) ranking.importance else channel?.importance
         val canBypassDnd = channel?.canBypassDnd() == true
 
         GlyphLog.d(TAG) {
             "$packageName:$channelId importance $importance, bypasses dnd $canBypassDnd"
         }
 
-        val isImportant = importance == null || importance >= NotificationManager.IMPORTANCE_DEFAULT
+        // Silent channels are still visible notifications; only fully blocked channels are ignored.
+        val isVisible = importance == null || importance > NotificationManager.IMPORTANCE_NONE
         val isAllowed =
             notificationManager.currentInterruptionFilter <=
                 NotificationManager.INTERRUPTION_FILTER_ALL || canBypassDnd
 
-        return isImportant && isAllowed
+        return isVisible && isAllowed
     }
 }
